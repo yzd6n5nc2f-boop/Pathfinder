@@ -102,7 +102,45 @@ export const mealPartners = [
   { name: "Costa", sponsored: false }
 ];
 
-export const commsPartners = ["EE", "O2", "Vodafone", "Three"];
+export const commsPartners = [
+  {
+    id: "ee",
+    name: "EE",
+    coverage: "UK network (example)",
+    sponsored: true
+  },
+  {
+    id: "o2",
+    name: "O2",
+    coverage: "UK network (example)",
+    sponsored: false
+  },
+  {
+    id: "vodafone",
+    name: "Vodafone",
+    coverage: "UK network (example)",
+    sponsored: true
+  },
+  {
+    id: "three",
+    name: "Three",
+    coverage: "UK network (example)",
+    sponsored: false
+  }
+];
+
+export const commsSponsoredOffers = [
+  {
+    id: "bonus-data",
+    title: "Bonus data with top-up",
+    description: "Example offer for release-day connectivity."
+  },
+  {
+    id: "starter-sim",
+    title: "Starter SIM pack",
+    description: "Example offer to get started quickly."
+  }
+];
 
 export const travelLinks = [
   { name: "Google Maps", href: "https://maps.google.com" },

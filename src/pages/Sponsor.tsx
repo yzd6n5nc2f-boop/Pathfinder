@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { PhoneIcon } from "../components/Icons";
 import type { SponsorPlan } from "../utils/sponsorPlan";
@@ -69,17 +68,16 @@ const Sponsor = () => {
 
   return (
     <div className="space-y-6">
-      <BackButton />
       <div className="rounded-3xl bg-brand-50 p-6 shadow-card">
         <h2 className="text-xl font-semibold text-ink">Sponsor support</h2>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-muted">
           If you feel at risk: 1) Call your sponsor 2) Call your caseworker 3) Use urgent support.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {contacts.map((contact) => (
             <div key={contact.name} className="rounded-2xl bg-white p-4">
               <p className="text-sm font-semibold text-ink">{contact.name}</p>
-              <p className="text-xs text-slate-500">{contact.phone}</p>
+              <p className="text-xs text-muted">{contact.phone}</p>
               <div className="mt-3 flex flex-col gap-2">
                 <Button>
                   <PhoneIcon className="h-4 w-4" />
@@ -97,7 +95,7 @@ const Sponsor = () => {
         <div className="grid gap-4 lg:grid-cols-3">
           <div className="rounded-3xl bg-white p-6 shadow-card">
             <h4 className="text-base font-semibold text-ink">If you feel at risk</h4>
-            <ol className="mt-4 space-y-3 text-sm text-slate-600">
+            <ol className="mt-4 space-y-3 text-sm text-muted">
               <li className="flex flex-col gap-2">
                 <span className="font-semibold text-ink">Step 1: Call sponsor</span>
                 <Button>Call sponsor</Button>
@@ -113,7 +111,7 @@ const Sponsor = () => {
                 </Button>
               </li>
             </ol>
-            <p className="mt-4 text-xs text-slate-500">
+            <p className="mt-4 text-xs text-muted">
               If sponsor isn&apos;t available, use your backup contact.
             </p>
           </div>
@@ -130,14 +128,14 @@ const Sponsor = () => {
                 {isEditingPlan ? "Save" : "Edit"}
               </Button>
             </div>
-            <ul className="mt-4 space-y-3 text-sm text-slate-600">
+            <ul className="mt-4 space-y-3 text-sm text-muted">
               <li className="flex items-start gap-2">
                 <span className="font-semibold text-ink">•</span>
                 {isEditingPlan ? (
                   <input
                     value={plan.reachOut}
                     onChange={(event) => setPlan((prev) => ({ ...prev, reachOut: event.target.value }))}
-                    className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                    className="flex-1 rounded-xl border border-line px-3 py-2 text-sm"
                   />
                 ) : (
                   <span>{plan.reachOut}</span>
@@ -153,7 +151,7 @@ const Sponsor = () => {
                       onChange={(event) =>
                         setPlan((prev) => ({ ...prev, checkInFrequency: event.target.value }))
                       }
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                      className="rounded-xl border border-line px-3 py-2 text-sm"
                     >
                       <option value="daily">daily</option>
                       <option value="3x week">3x week</option>
@@ -172,7 +170,7 @@ const Sponsor = () => {
                     <select
                       value={plan.backupContact}
                       onChange={(event) => setPlan((prev) => ({ ...prev, backupContact: event.target.value }))}
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                      className="rounded-xl border border-line px-3 py-2 text-sm"
                     >
                       {contacts.map((contact) => (
                         <option key={contact.name} value={contact.name}>
@@ -191,7 +189,7 @@ const Sponsor = () => {
                   <input
                     value={plan.boundary}
                     onChange={(event) => setPlan((prev) => ({ ...prev, boundary: event.target.value }))}
-                    className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                    className="flex-1 rounded-xl border border-line px-3 py-2 text-sm"
                   />
                 ) : (
                   <span>{plan.boundary}</span>
@@ -202,9 +200,9 @@ const Sponsor = () => {
 
           <div className="rounded-3xl bg-white p-6 shadow-card">
             <h4 className="text-base font-semibold text-ink">Quick self-check</h4>
-            <div className="mt-4 grid gap-3 text-sm text-slate-600">
+            <div className="mt-4 grid gap-3 text-sm text-muted">
               {quickCheckFlags.map((flag) => (
-                <label key={flag} className="flex items-center gap-3 rounded-2xl border border-slate-200 p-3">
+                <label key={flag} className="flex items-center gap-3 rounded-2xl border border-line p-3">
                   <input
                     type="checkbox"
                     checked={Boolean(quickCheckState[flag])}
@@ -229,21 +227,21 @@ const Sponsor = () => {
       <div className="rounded-3xl bg-white p-6 shadow-card">
         <h3 className="text-lg font-semibold text-ink">Add or edit sponsor contact</h3>
         <form className="mt-4 grid gap-4 sm:grid-cols-2" onSubmit={handleAdd}>
-          <label className="flex flex-col gap-2 text-sm font-semibold text-slate-600">
+          <label className="flex flex-col gap-2 text-sm font-semibold text-muted">
             Name
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
-              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className="rounded-xl border border-line px-3 py-2 text-sm"
               placeholder="Sponsor name"
             />
           </label>
-          <label className="flex flex-col gap-2 text-sm font-semibold text-slate-600">
+          <label className="flex flex-col gap-2 text-sm font-semibold text-muted">
             Phone number
             <input
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
-              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className="rounded-xl border border-line px-3 py-2 text-sm"
               placeholder="07 7000 00000"
             />
           </label>

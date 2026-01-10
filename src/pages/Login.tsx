@@ -41,19 +41,19 @@ const Login = () => {
         <main className="flex w-full flex-1 flex-col gap-6 px-4 py-6 md:px-6 md:py-8 lg:px-8">
           <section className="rounded-3xl bg-white p-6 text-center shadow-card">
             <h1 className="text-2xl font-semibold text-ink">Pathway Forward</h1>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-muted">
               Quick access to support on release day.
             </p>
-            <p className="mt-3 text-xs text-slate-500">Sign in once and we will keep you ready.</p>
+            <p className="mt-3 text-xs text-muted">Sign in once and we will keep you ready.</p>
           </section>
 
           <form className="space-y-4" onSubmit={handleContinue}>
-            <label className="flex flex-col gap-2 text-sm font-semibold text-slate-600">
+            <label className="flex flex-col gap-2 text-sm font-semibold text-muted">
               Your first name (optional)
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                className="rounded-xl border border-line px-3 py-2 text-sm"
                 placeholder="e.g. Sam"
               />
             </label>
@@ -67,7 +67,7 @@ const Login = () => {
 
           <button
             type="button"
-            className="text-center text-xs font-semibold text-brand-700"
+            className="text-center text-xs font-semibold text-brand"
             onClick={() => {
               clearStoredUser();
               showToast("Saved session cleared.");

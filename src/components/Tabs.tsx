@@ -22,7 +22,7 @@ const Tabs = () => {
               className={({ isActive }) =>
                 `relative flex h-16 flex-col items-center justify-center gap-1 px-2 text-[12px] font-semibold transition ${
                   isActive
-                    ? "text-brandBlue-end"
+                    ? "text-brand"
                     : "text-muted hover:bg-app"
                 } ${index < tabs.length - 1 ? "border-r border-line" : ""}`
               }
@@ -35,7 +35,7 @@ const Tabs = () => {
                       (isActive ? "bg-app" : "")
                     }
                   >
-                    <Icon className="h-5 w-5 text-brandBlue-end" />
+                    <Icon className={`h-5 w-5 ${isActive ? "text-brand" : "text-muted"}`} />
                   </span>
                   {tab.label}
                 </>

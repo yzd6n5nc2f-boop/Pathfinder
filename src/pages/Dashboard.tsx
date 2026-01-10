@@ -21,7 +21,7 @@ const Dashboard = () => {
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">
           Your next steps
         </p>
-        <h1 className="mt-2 text-3xl font-semibold text-brandBlue-end">
+        <h1 className="mt-2 text-3xl font-semibold text-brand">
           Rebuild your future.
         </h1>
         <p className="mt-2 text-sm font-medium text-muted">
@@ -30,13 +30,13 @@ const Dashboard = () => {
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             to="/sponsor"
-            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-button bg-gradient-to-r from-brandBlue-start to-brandBlue-end px-4 py-2 text-sm font-semibold text-white shadow-card"
+            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-button bg-brand-gradient px-4 py-2 text-sm font-semibold text-white shadow-card"
           >
             Get Support
           </Link>
           <Link
             to="/jobs"
-            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-button bg-gradient-to-r from-accentOrange-start to-accentOrange-end px-4 py-2 text-sm font-semibold text-white shadow-card"
+            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-button bg-amber-gradient px-4 py-2 text-sm font-semibold text-white shadow-card"
           >
             Find opportunities
           </Link>
@@ -44,35 +44,35 @@ const Dashboard = () => {
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <Link
             to="/first-meal"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brandBlue-end"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
           >
             First meal voucher
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
           <Link
             to="/comms"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brandBlue-end"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
           >
             Phone credit
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
           <Link
             to="/sponsor"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brandBlue-end"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
           >
             Sponsor contact
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
           <Link
             to="/travel"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brandBlue-end"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
           >
             Travel support
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
           <Link
             to="/resources"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brandBlue-end"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
           >
             Support directory
             <ArrowRightIcon className="h-4 w-4" />
@@ -92,7 +92,7 @@ const Dashboard = () => {
                   <p className="font-semibold text-ink">{contact.name}</p>
                   <p className="text-xs text-muted">{contact.role}</p>
                 </div>
-                <button className="inline-flex min-h-[40px] items-center gap-2 rounded-full bg-[#eaf1f8] px-3 text-xs font-semibold text-brandBlue-end">
+                <button className="inline-flex min-h-[40px] items-center gap-2 rounded-full bg-[#eaf1f8] px-3 text-xs font-semibold text-brand">
                   <PhoneIcon className="h-4 w-4" />
                   {contact.action}
                 </button>
@@ -120,7 +120,7 @@ const Dashboard = () => {
           </ul>
           <Link
             to="/jobs"
-            className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-accentOrange-end"
+            className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-accent"
           >
             See all jobs
             <ArrowRightIcon className="h-4 w-4" />
@@ -181,7 +181,7 @@ const Dashboard = () => {
           </ul>
           <Link
             to="/community"
-            className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-brandBlue-end"
+            className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-brand"
           >
             Join the discussion
             <ArrowRightIcon className="h-4 w-4" />
