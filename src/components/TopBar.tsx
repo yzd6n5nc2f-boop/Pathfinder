@@ -13,7 +13,7 @@ const TopBar = ({ showUser = true }: TopBarProps) => {
   const initial = displayName.slice(0, 1).toUpperCase() || "G";
 
   return (
-    <header className="bg-gradient-to-r from-brandBlue-start to-brandBlue-end text-white">
+    <header className="bg-brand-gradient text-white">
       <div className="flex items-center justify-between px-4 py-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15">

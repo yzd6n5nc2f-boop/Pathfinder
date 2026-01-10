@@ -5,10 +5,10 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variants = {
-  primary: "bg-brand-600 text-white hover:bg-brand-700",
-  secondary: "bg-white text-brand-700 border border-brand-200 hover:bg-brand-50",
-  amber: "bg-amber-500 text-white hover:bg-amber-600",
-  ghost: "bg-transparent text-brand-700 hover:bg-brand-50"
+  primary: "bg-brand-gradient text-white hover:opacity-95",
+  secondary: "bg-white text-brand border border-line hover:bg-app",
+  amber: "bg-amber-gradient text-white hover:opacity-95",
+  ghost: "bg-transparent text-brand hover:bg-app"
 };
 
 const Button = ({ className = "", variant = "primary", ...props }: ButtonProps) => (

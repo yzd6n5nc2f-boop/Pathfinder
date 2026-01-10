@@ -24,6 +24,32 @@ body {
   background-color: var(--color-app-bg);
 }
 
+@layer utilities {
+  .bg-brand-gradient {
+    background: linear-gradient(90deg, var(--color-brand-blue-start), var(--color-brand-blue-end));
+  }
+
+  .bg-amber-gradient {
+    background: linear-gradient(90deg, var(--color-accent-orange-start), var(--color-accent-orange-end));
+  }
+
+  .bg-neutral-gradient {
+    background: linear-gradient(90deg, var(--color-warm-neutral-start), var(--color-warm-neutral-end));
+  }
+
+  .text-brand {
+    color: var(--color-brand-blue-end);
+  }
+
+  .text-accent {
+    color: var(--color-accent-orange-end);
+  }
+
+  .border-brand {
+    border-color: var(--color-brand-blue-end);
+  }
+}
+
 button:focus-visible,
 a:focus-visible {
   outline: 2px solid #d9790b;
