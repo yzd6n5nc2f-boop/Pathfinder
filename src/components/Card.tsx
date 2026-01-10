@@ -10,7 +10,7 @@ type CardProps = {
 const tones = {
   blue: "bg-brand-gradient text-white",
   amber: "bg-amber-gradient text-white",
-  neutral: "bg-neutral-gradient text-white"
+  neutral: "bg-brand-gradient text-white"
 };
 
 const Card = ({ title, headerTone = "neutral", children, actions }: CardProps) => {
