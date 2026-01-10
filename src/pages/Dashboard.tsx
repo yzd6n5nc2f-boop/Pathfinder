@@ -88,7 +88,7 @@ const Dashboard = () => {
         </div>
       </section>
 
-      <section className="grid gap-3 min-[420px]:grid-cols-2">
+      <section className="grid gap-3 md:grid-cols-2">
         <Card title="Support contacts" headerTone="blue">
           <ul className="divide-y divide-line">
             {supportContacts.map((contact) => (
