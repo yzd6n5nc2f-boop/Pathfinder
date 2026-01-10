@@ -4,9 +4,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink: "#0f172a",
-        slate: "#64748b",
-        calm: "#f8fafc",
+        app: "var(--color-app-bg)",
+        surface: "var(--color-surface)",
+        line: "var(--color-line)",
+        ink: "var(--color-text)",
+        muted: "var(--color-text-muted)",
+        brandBlue: {
+          start: "var(--color-brand-blue-start)",
+          end: "var(--color-brand-blue-end)"
+        },
+        accentOrange: {
+          start: "var(--color-accent-orange-start)",
+          end: "var(--color-accent-orange-end)"
+        },
+        warmNeutral: {
+          start: "var(--color-warm-neutral-start)",
+          end: "var(--color-warm-neutral-end)"
+        },
         brand: {
           50: "#eef5ff",
           100: "#d9e9ff",
@@ -31,7 +45,13 @@ module.exports = {
         }
       },
       boxShadow: {
-        card: "0 10px 30px rgba(15, 23, 42, 0.08)"
+        card: "0 10px 25px rgba(20, 32, 51, 0.1)",
+        phone: "0 24px 60px rgba(20, 32, 51, 0.18)"
+      },
+      borderRadius: {
+        device: "30px",
+        card: "18px",
+        button: "14px"
       }
     }
   },

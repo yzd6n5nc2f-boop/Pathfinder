@@ -11,22 +11,35 @@ const tabs = [
 
 const Tabs = () => {
   return (
-    <nav className="border-b border-slate-200 bg-white">
-      <div className="mx-auto grid max-w-6xl grid-cols-4 gap-2 px-4 py-3 sm:px-6">
-        {tabs.map((tab) => {
+    <nav className="border-b border-line bg-white">
+      <div className="grid grid-cols-4 px-2 py-2">
+        {tabs.map((tab, index) => {
           const Icon = tab.icon;
           return (
             <NavLink
               key={tab.label}
               to={tab.to}
               className={({ isActive }) =>
-                `flex h-14 flex-col items-center justify-center gap-1 rounded-xl text-xs font-medium transition ${
-                  isActive ? "bg-brand-50 text-brand-600" : "text-slate-500 hover:bg-slate-50"
-                }`
+                `relative flex h-16 flex-col items-center justify-center gap-1 px-2 text-[12px] font-semibold transition ${
+                  isActive
+                    ? "text-brandBlue-end"
+                    : "text-muted hover:bg-app"
+                } ${index < tabs.length - 1 ? "border-r border-line" : ""}`
               }
             >
-              <Icon className="h-5 w-5" />
-              {tab.label}
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={
+                      "flex h-8 w-8 items-center justify-center rounded-lg transition " +
+                      (isActive ? "bg-app" : "")
+                    }
+                  >
+                    <Icon className="h-5 w-5 text-brandBlue-end" />
+                  </span>
+                  {tab.label}
+                </>
+              )}
             </NavLink>
           );
         })}
