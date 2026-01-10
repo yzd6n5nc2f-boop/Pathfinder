@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import Footer from "../components/Footer";
 import { useToast } from "../components/Toast";
 import TopBar from "../components/TopBar";
-import { readStoredUser, writeStoredUser } from "../utils/auth";
+import { clearStoredUser, readStoredUser, writeStoredUser } from "../utils/auth";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,8 +18,9 @@ const Login = () => {
 
   const handleContinue = (event: React.FormEvent) => {
     event.preventDefault();
+    const trimmed = name.trim();
     writeStoredUser({
-      name: name.trim(),
+      name: trimmed || "Guest",
       createdAt: new Date().toISOString()
     });
     navigate("/", { replace: true });
@@ -26,7 +28,7 @@ const Login = () => {
 
   const handleGuest = () => {
     writeStoredUser({
-      name: "",
+      name: "Guest",
       createdAt: new Date().toISOString()
     });
     navigate("/", { replace: true });
@@ -42,9 +44,7 @@ const Login = () => {
             <p className="mt-2 text-sm text-slate-600">
               Quick access to support on release day.
             </p>
-            <p className="mt-3 text-xs text-slate-500">
-              Sign in once and we will keep your place ready.
-            </p>
+            <p className="mt-3 text-xs text-slate-500">Sign in once and we will keep you ready.</p>
           </section>
 
           <form className="space-y-4" onSubmit={handleContinue}>
@@ -68,13 +68,15 @@ const Login = () => {
           <button
             type="button"
             className="text-center text-xs font-semibold text-brand-700"
-            onClick={() =>
-              showToast("Contact support on 0800 000 000 for help with access.")
-            }
+            onClick={() => {
+              clearStoredUser();
+              showToast("Saved session cleared.");
+            }}
           >
-            Contact support
+            Clear saved session
           </button>
         </main>
+        <Footer />
       </div>
     </div>
   );

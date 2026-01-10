@@ -1,4 +1,5 @@
 import React from "react";
+import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { useToast } from "../components/Toast";
 import { mealPartners } from "../data/mock";
@@ -8,12 +9,14 @@ const FirstMeal = () => {
 
   return (
     <div className="space-y-6">
+      <BackButton />
       <div className="rounded-3xl bg-white p-6 shadow-card">
         <p className="text-sm uppercase tracking-wide text-slate-500">First meal on release day</p>
-        <h2 className="mt-2 text-2xl font-semibold text-ink">£5 meal voucher (no alcohol)</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-ink">£5 meal voucher</h2>
         <p className="mt-2 text-sm text-slate-600">
           Choose a trusted sponsor to redeem your first meal safely.
         </p>
+        <p className="mt-2 text-xs text-slate-500">Voucher can’t be used for alcohol.</p>
         <div className="mt-4 rounded-2xl border border-dashed border-amber-300 bg-amber-50 p-4 text-sm text-amber-700">
           Example partner slot
         </div>

@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import BackButton from "../components/BackButton";
 import { resourceCards } from "../data/mock";
 
 const Resources = () => {
   return (
     <div className="space-y-4">
+      <BackButton />
       <h2 className="text-xl font-semibold text-ink">Helpful numbers and support</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {resourceCards.map((resource) => (
