@@ -1,6 +1,8 @@
 export type PfUser = {
   name: string;
   createdAt: string;
+  lastVoucherId?: string;
+  lastVoucherRedeemedAt?: string;
 };
 
 const storageKey = "pf_user";
@@ -23,7 +25,12 @@ export const readStoredUser = (): PfUser | null => {
 
     return {
       name: typeof parsed.name === "string" ? parsed.name : "",
-      createdAt: typeof parsed.createdAt === "string" ? parsed.createdAt : ""
+      createdAt: typeof parsed.createdAt === "string" ? parsed.createdAt : "",
+      lastVoucherId: typeof parsed.lastVoucherId === "string" ? parsed.lastVoucherId : undefined,
+      lastVoucherRedeemedAt:
+        typeof parsed.lastVoucherRedeemedAt === "string"
+          ? parsed.lastVoucherRedeemedAt
+          : undefined
     };
   } catch {
     return null;
