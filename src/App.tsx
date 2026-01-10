@@ -4,16 +4,22 @@ import PageLayout from "./components/PageLayout";
 import { ToastProvider } from "./components/Toast";
 import Community from "./pages/Community";
 import Comms from "./pages/Comms";
+import ContactDetail from "./pages/ContactDetail";
+import Contacts from "./pages/Contacts";
+import CourseDetail from "./pages/CourseDetail";
+import Courses from "./pages/Courses";
 import Dashboard from "./pages/Dashboard";
 import Employers from "./pages/Employers";
 import EmployerDetail from "./pages/EmployerDetail";
 import FirstMeal from "./pages/FirstMeal";
+import JobDetail from "./pages/JobDetail";
 import Jobs from "./pages/Jobs";
 import Login from "./pages/Login";
 import Messages from "./pages/Messages";
 import ResourceDetail from "./pages/ResourceDetail";
 import Resources from "./pages/Resources";
 import Sponsor from "./pages/Sponsor";
+import TopicDetail from "./pages/TopicDetail";
 import Travel from "./pages/Travel";
 import TravelDetail from "./pages/TravelDetail";
 import { readStoredUser } from "./utils/auth";
@@ -69,6 +75,14 @@ const App = () => {
             element={
               <ProtectedPage>
                 <Community />
+              </ProtectedPage>
+            }
+          />
+          <Route
+            path="/community/:id"
+            element={
+              <ProtectedPage showTabs={false}>
+                <TopicDetail />
               </ProtectedPage>
             }
           />
@@ -129,10 +143,50 @@ const App = () => {
             }
           />
           <Route
+            path="/contacts"
+            element={
+              <ProtectedPage showTabs={false}>
+                <Contacts />
+              </ProtectedPage>
+            }
+          />
+          <Route
+            path="/contacts/:id"
+            element={
+              <ProtectedPage showTabs={false}>
+                <ContactDetail />
+              </ProtectedPage>
+            }
+          />
+          <Route
             path="/jobs"
             element={
               <ProtectedPage showTabs={false}>
                 <Jobs />
+              </ProtectedPage>
+            }
+          />
+          <Route
+            path="/jobs/:id"
+            element={
+              <ProtectedPage showTabs={false}>
+                <JobDetail />
+              </ProtectedPage>
+            }
+          />
+          <Route
+            path="/courses"
+            element={
+              <ProtectedPage showTabs={false}>
+                <Courses />
+              </ProtectedPage>
+            }
+          />
+          <Route
+            path="/courses/:id"
+            element={
+              <ProtectedPage showTabs={false}>
+                <CourseDetail />
               </ProtectedPage>
             }
           />
