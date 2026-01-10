@@ -1,4 +1,5 @@
 import React from "react";
+import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { useToast } from "../components/Toast";
 import { MapIcon } from "../components/Icons";
@@ -9,9 +10,12 @@ const Travel = () => {
 
   return (
     <div className="space-y-6">
+      <BackButton />
       <div className="rounded-3xl bg-white p-6 shadow-card">
         <p className="text-sm uppercase tracking-wide text-slate-500">Travel</p>
-        <h2 className="mt-2 text-2xl font-semibold text-ink">Plan your route home</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-ink">
+          Plan travel to probation/appointments
+        </h2>
         <p className="mt-2 text-sm text-slate-600">
           Ask about a 2-day Travelcard if you need time to settle in.
         </p>

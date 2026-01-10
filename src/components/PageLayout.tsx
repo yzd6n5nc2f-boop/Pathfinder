@@ -1,4 +1,5 @@
 import React from "react";
+import Footer from "./Footer";
 import TopBar from "./TopBar";
 import Tabs from "./Tabs";
 
@@ -16,6 +17,7 @@ const PageLayout = ({ showTabs = true, children }: PageLayoutProps) => {
         <main className="flex w-full flex-1 flex-col gap-4 px-4 py-5 md:px-6 md:py-6 lg:px-8">
           {children}
         </main>
+        <Footer />
       </div>
     </div>
   );

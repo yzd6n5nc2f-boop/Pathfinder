@@ -1,11 +1,13 @@
 import React from "react";
-import { readStoredUser } from "../utils/auth";
+import { useNavigate } from "react-router-dom";
+import { clearStoredUser, readStoredUser } from "../utils/auth";
 
 type TopBarProps = {
   showUser?: boolean;
 };
 
 const TopBar = ({ showUser = true }: TopBarProps) => {
+  const navigate = useNavigate();
   const storedUser = readStoredUser();
   const displayName = storedUser?.name.trim() ? storedUser.name.trim() : "Guest";
   const initial = displayName.slice(0, 1).toUpperCase() || "G";
@@ -24,7 +26,19 @@ const TopBar = ({ showUser = true }: TopBarProps) => {
         </div>
         {showUser ? (
           <div className="flex items-center gap-3">
-            <p className="text-sm font-semibold">Welcome, {displayName}!</p>
+            <div className="text-right">
+              <p className="text-sm font-semibold">Welcome, {displayName}!</p>
+              <button
+                type="button"
+                className="text-xs font-semibold text-white/80 transition hover:text-white"
+                onClick={() => {
+                  clearStoredUser();
+                  navigate("/login", { replace: true });
+                }}
+              >
+                Sign out
+              </button>
+            </div>
             <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/80 bg-white/20 text-sm font-semibold">
               {initial}
             </div>

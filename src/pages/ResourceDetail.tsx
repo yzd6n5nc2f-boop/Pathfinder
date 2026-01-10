@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
+import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { resourceCards } from "../data/mock";
 
@@ -10,6 +11,7 @@ const ResourceDetail = () => {
   if (!resource) {
     return (
       <div className="space-y-4">
+        <BackButton />
         <p className="text-sm text-slate-500">Resource not found.</p>
         <Link to="/resources" className="text-sm font-semibold text-brand-700">
           Back to resources
@@ -20,6 +22,7 @@ const ResourceDetail = () => {
 
   return (
     <div className="space-y-4">
+      <BackButton />
       <h2 className="text-xl font-semibold text-ink">{resource.title}</h2>
       <div className="rounded-2xl bg-white p-5 shadow-card">
         <p className="text-sm text-slate-600">{resource.details}</p>

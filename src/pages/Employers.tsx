@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { employers, employersFilters } from "../data/mock";
 
@@ -9,6 +10,7 @@ const Employers = () => {
 
   return (
     <div className="space-y-6">
+      <BackButton />
       <div>
         <h2 className="text-xl font-semibold text-ink">Employers directory</h2>
         <p className="mt-1 text-sm text-slate-500">

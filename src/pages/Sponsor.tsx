@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { PhoneIcon } from "../components/Icons";
 
@@ -22,6 +23,7 @@ const Sponsor = () => {
 
   return (
     <div className="space-y-6">
+      <BackButton />
       <div className="rounded-3xl bg-brand-50 p-6 shadow-card">
         <h2 className="text-xl font-semibold text-ink">Sponsor support</h2>
         <p className="mt-2 text-sm text-slate-600">
