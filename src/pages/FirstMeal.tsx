@@ -9,13 +9,13 @@ const FirstMeal = () => {
   return (
     <div className="space-y-6">
       <div className="rounded-3xl bg-white p-6 shadow-card">
-        <p className="text-sm uppercase tracking-wide text-slate-500">First meal on release</p>
+        <p className="text-sm uppercase tracking-wide text-slate-500">First meal on release day</p>
         <h2 className="mt-2 text-2xl font-semibold text-ink">£5 meal voucher (no alcohol)</h2>
         <p className="mt-2 text-sm text-slate-600">
           Choose a trusted sponsor to redeem your first meal safely.
         </p>
         <div className="mt-4 rounded-2xl border border-dashed border-amber-300 bg-amber-50 p-4 text-sm text-amber-700">
-          Sponsored banner slot
+          Example partner slot
         </div>
       </div>
 
@@ -26,7 +26,7 @@ const FirstMeal = () => {
               <p className="text-sm font-semibold text-ink">{partner.name}</p>
               {partner.sponsored ? (
                 <span className="rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700">
-                  Sponsored
+                  Example
                 </span>
               ) : null}
             </div>
@@ -36,13 +36,13 @@ const FirstMeal = () => {
       </div>
 
       <div className="rounded-2xl border border-dashed border-brand-200 bg-brand-50 p-4 text-sm text-brand-700">
-        Sponsored offer slot
+        Example offer slot
       </div>
 
       <div className="rounded-3xl bg-white p-6 shadow-card">
         <h3 className="text-lg font-semibold text-ink">How it works</h3>
         <ol className="mt-3 space-y-2 text-sm text-slate-600">
-          <li>1. Choose a sponsor or partner on release day.</li>
+          <li>1. Choose a sponsor or example partner on release day.</li>
           <li>2. Show your voucher at the counter.</li>
           <li>3. Enjoy a warm meal before you travel onward.</li>
         </ol>
@@ -56,7 +56,7 @@ const FirstMeal = () => {
       </div>
 
       <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">
-        Sponsored partner slot
+        Example partner slot
       </div>
     </div>
   );

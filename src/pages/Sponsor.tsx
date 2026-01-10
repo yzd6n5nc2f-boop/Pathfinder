@@ -23,9 +23,9 @@ const Sponsor = () => {
   return (
     <div className="space-y-6">
       <div className="rounded-3xl bg-brand-50 p-6 shadow-card">
-        <h2 className="text-xl font-semibold text-ink">Sponsor Support</h2>
+        <h2 className="text-xl font-semibold text-ink">Sponsor support</h2>
         <p className="mt-2 text-sm text-slate-600">
-          If you feel at risk: 1) Call sponsor 2) Call case worker 3) Use urgent support.
+          If you feel at risk: 1) Call your sponsor 2) Call your caseworker 3) Use urgent support.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {contacts.map((contact) => (
@@ -45,7 +45,7 @@ const Sponsor = () => {
       </div>
 
       <div className="rounded-3xl bg-white p-6 shadow-card">
-        <h3 className="text-lg font-semibold text-ink">Add / Edit sponsor contact</h3>
+        <h3 className="text-lg font-semibold text-ink">Add or edit sponsor contact</h3>
         <form className="mt-4 grid gap-4 sm:grid-cols-2" onSubmit={handleAdd}>
           <label className="flex flex-col gap-2 text-sm font-semibold text-slate-600">
             Name

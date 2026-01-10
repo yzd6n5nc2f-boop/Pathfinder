@@ -1,6 +1,15 @@
 import React from "react";
+import { readStoredUser } from "../utils/auth";
 
-const TopBar = () => {
+type TopBarProps = {
+  showUser?: boolean;
+};
+
+const TopBar = ({ showUser = true }: TopBarProps) => {
+  const storedUser = readStoredUser();
+  const displayName = storedUser?.name.trim() ? storedUser.name.trim() : "Guest";
+  const initial = displayName.slice(0, 1).toUpperCase() || "G";
+
   return (
     <header className="bg-gradient-to-r from-brandBlue-start to-brandBlue-end text-white">
       <div className="flex items-center justify-between px-4 py-4">
@@ -13,12 +22,14 @@ const TopBar = () => {
           </div>
           <div className="text-sm font-semibold tracking-wide">Pathway Forward</div>
         </div>
-        <div className="flex items-center gap-3">
-          <p className="text-sm font-semibold">Welcome, John!</p>
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/80 bg-white/20 text-sm font-semibold">
-            J
+        {showUser ? (
+          <div className="flex items-center gap-3">
+            <p className="text-sm font-semibold">Welcome, {displayName}!</p>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/80 bg-white/20 text-sm font-semibold">
+              {initial}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </header>
   );

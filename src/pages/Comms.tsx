@@ -9,10 +9,10 @@ const Comms = () => {
   return (
     <div className="space-y-6">
       <div className="rounded-3xl bg-white p-6 shadow-card">
-        <p className="text-sm uppercase tracking-wide text-slate-500">Comms credit</p>
-        <h2 className="mt-2 text-2xl font-semibold text-ink">£5 data / call credit</h2>
+        <p className="text-sm uppercase tracking-wide text-slate-500">Mobile credit</p>
+        <h2 className="mt-2 text-2xl font-semibold text-ink">£5 data and call credit</h2>
         <p className="mt-2 text-sm text-slate-600">
-          So you can call, text, and email on release day.
+          So you can call, text and email on release day.
         </p>
         <Button
           className="mt-5 w-full"
@@ -23,7 +23,10 @@ const Comms = () => {
       </div>
 
       <div className="rounded-3xl bg-white p-6 shadow-card">
-        <h3 className="text-lg font-semibold text-ink">Partner networks</h3>
+        <h3 className="text-lg font-semibold text-ink">Example partners</h3>
+        <p className="mt-2 text-xs text-slate-500">
+          Example partners only — no formal partnerships claimed.
+        </p>
         <div className="mt-4 flex flex-wrap gap-3">
           {commsPartners.map((partner) => (
             <span

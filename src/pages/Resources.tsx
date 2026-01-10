@@ -5,7 +5,7 @@ import { resourceCards } from "../data/mock";
 const Resources = () => {
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-ink">Helpful Numbers & Resources</h2>
+      <h2 className="text-xl font-semibold text-ink">Helpful numbers and support</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {resourceCards.map((resource) => (
           <Link
@@ -19,7 +19,7 @@ const Resources = () => {
         ))}
       </div>
       <div className="rounded-2xl bg-brand-50 p-4 text-sm text-brand-700">
-        If you need urgent help, use your sponsor or case worker straight away.
+        If you need urgent help, contact your sponsor or caseworker straight away.
       </div>
     </div>
   );
