@@ -1,10 +1,19 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const BackButton = () => {
+type BackButtonProps = {
+  label?: string;
+  to?: string;
+};
+
+const BackButton = ({ label = "Back", to }: BackButtonProps) => {
   const navigate = useNavigate();
 
   const handleBack = () => {
+    if (to) {
+      navigate(to, { replace: true });
+      return;
+    }
     if (window.history.length > 1) {
       navigate(-1);
       return;
@@ -19,7 +28,7 @@ const BackButton = () => {
       className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5 text-sm font-semibold text-brandBlue-end shadow-card transition hover:bg-app"
     >
       <span className="text-lg leading-none">←</span>
-      Back
+      {label}
     </button>
   );
 };
