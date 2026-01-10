@@ -6,6 +6,7 @@ import Community from "./pages/Community";
 import Comms from "./pages/Comms";
 import Dashboard from "./pages/Dashboard";
 import Employers from "./pages/Employers";
+import EmployerDetail from "./pages/EmployerDetail";
 import FirstMeal from "./pages/FirstMeal";
 import Jobs from "./pages/Jobs";
 import Login from "./pages/Login";
@@ -14,6 +15,7 @@ import ResourceDetail from "./pages/ResourceDetail";
 import Resources from "./pages/Resources";
 import Sponsor from "./pages/Sponsor";
 import Travel from "./pages/Travel";
+import TravelDetail from "./pages/TravelDetail";
 import { readStoredUser } from "./utils/auth";
 
 type ProtectedPageProps = {
@@ -119,6 +121,14 @@ const App = () => {
             }
           />
           <Route
+            path="/travel/:id"
+            element={
+              <ProtectedPage showTabs={false}>
+                <TravelDetail />
+              </ProtectedPage>
+            }
+          />
+          <Route
             path="/jobs"
             element={
               <ProtectedPage showTabs={false}>
@@ -131,6 +141,14 @@ const App = () => {
             element={
               <ProtectedPage showTabs={false}>
                 <Employers />
+              </ProtectedPage>
+            }
+          />
+          <Route
+            path="/employers/:id"
+            element={
+              <ProtectedPage showTabs={false}>
+                <EmployerDetail />
               </ProtectedPage>
             }
           />
