@@ -1,7 +1,7 @@
 export const supportContacts = [
   {
-    name: "Case Worker Sarah",
-    role: "Your Support Advisor",
+    name: "Caseworker Sarah",
+    role: "Your support adviser",
     action: "Contact"
   },
   {
@@ -11,7 +11,7 @@ export const supportContacts = [
   },
   {
     name: "Counsellor Emma",
-    role: "Counselling Support",
+    role: "Counselling support",
     action: "Contact"
   }
 ];
@@ -23,13 +23,13 @@ export const jobOpportunities = [
 ];
 
 export const communityTopics = [
-  { title: "Staying Positive After Release", replies: 12 },
-  { title: "Housing Options Advice", replies: 8 }
+  { title: "Staying positive after release", replies: 12 },
+  { title: "Housing options advice", replies: 8 }
 ];
 
 export const messages = [
   {
-    sender: "Support Advisor",
+    sender: "Support adviser",
     snippet: "Checking in to see how your plans are going." 
   },
   {

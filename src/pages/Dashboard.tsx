@@ -22,7 +22,7 @@ const Dashboard = () => {
           Your next steps
         </p>
         <h1 className="mt-2 text-3xl font-semibold text-brandBlue-end">
-          Rebuild Your Future.
+          Rebuild your future.
         </h1>
         <p className="mt-2 text-sm font-medium text-muted">
           Connect. Support. Thrive.
@@ -38,7 +38,7 @@ const Dashboard = () => {
             to="/jobs"
             className="inline-flex min-h-[44px] w-full items-center justify-center rounded-button bg-gradient-to-r from-accentOrange-start to-accentOrange-end px-4 py-2 text-sm font-semibold text-white shadow-card"
           >
-            Find Opportunities
+            Find opportunities
           </Link>
         </div>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
@@ -53,7 +53,7 @@ const Dashboard = () => {
             to="/comms"
             className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brandBlue-end"
           >
-            Comms credit
+            Mobile credit
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
           <Link
@@ -74,14 +74,14 @@ const Dashboard = () => {
             to="/resources"
             className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brandBlue-end"
           >
-            Resources directory
+            Support directory
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </div>
       </section>
 
       <section className="grid gap-3 min-[420px]:grid-cols-2">
-        <Card title="Support Contacts" headerTone="blue">
+        <Card title="Support contacts" headerTone="blue">
           <ul className="divide-y divide-line">
             {supportContacts.map((contact) => (
               <li
@@ -102,7 +102,7 @@ const Dashboard = () => {
         </Card>
 
         <Card
-          title="Job Opportunities"
+          title="Job opportunities"
           headerTone="amber"
           actions={
             <Link to="/jobs" className="text-xs font-semibold text-white/90">
@@ -122,13 +122,13 @@ const Dashboard = () => {
             to="/jobs"
             className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-accentOrange-end"
           >
-            See All Jobs
+            See all jobs
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </Card>
 
         <Card
-          title="Learning & Courses"
+          title="Learning & courses"
           headerTone="neutral"
           actions={
             <Link
@@ -155,7 +155,7 @@ const Dashboard = () => {
         </Card>
 
         <Card
-          title="Community Forum"
+          title="Community forum"
           headerTone="blue"
           actions={
             <Link
@@ -183,7 +183,7 @@ const Dashboard = () => {
             to="/community"
             className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-brandBlue-end"
           >
-            Join the Discussion
+            Join the discussion
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </Card>

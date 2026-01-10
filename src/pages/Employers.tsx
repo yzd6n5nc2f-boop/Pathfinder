@@ -10,7 +10,7 @@ const Employers = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-ink">Employers Directory</h2>
+        <h2 className="text-xl font-semibold text-ink">Employers directory</h2>
         <p className="mt-1 text-sm text-slate-500">
           UK-friendly employers. Examples only — no formal partnerships claimed.
         </p>
@@ -48,7 +48,7 @@ const Employers = () => {
               onChange={(event) => setNoExperience(event.target.checked)}
               className="h-4 w-4"
             />
-            No experience
+            No experience needed
           </label>
         </div>
         <p className="mt-3 text-xs text-slate-500">

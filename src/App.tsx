@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import PageLayout from "./components/PageLayout";
 import { ToastProvider } from "./components/Toast";
 import Community from "./pages/Community";
@@ -8,103 +8,130 @@ import Dashboard from "./pages/Dashboard";
 import Employers from "./pages/Employers";
 import FirstMeal from "./pages/FirstMeal";
 import Jobs from "./pages/Jobs";
+import Login from "./pages/Login";
 import Messages from "./pages/Messages";
 import ResourceDetail from "./pages/ResourceDetail";
 import Resources from "./pages/Resources";
 import Sponsor from "./pages/Sponsor";
 import Travel from "./pages/Travel";
+import { readStoredUser } from "./utils/auth";
+
+type ProtectedPageProps = {
+  children: React.ReactNode;
+  showTabs?: boolean;
+};
+
+const RequireAuth = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  const user = readStoredUser();
+
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  return <>{children}</>;
+};
+
+const ProtectedPage = ({ children, showTabs }: ProtectedPageProps) => {
+  return (
+    <RequireAuth>
+      <PageLayout showTabs={showTabs}>{children}</PageLayout>
+    </RequireAuth>
+  );
+};
 
 const App = () => {
   return (
     <BrowserRouter>
       <ToastProvider>
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route
             path="/"
             element={
-              <PageLayout>
+              <ProtectedPage>
                 <Dashboard />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/messages"
             element={
-              <PageLayout>
+              <ProtectedPage>
                 <Messages />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/community"
             element={
-              <PageLayout>
+              <ProtectedPage>
                 <Community />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/resources"
             element={
-              <PageLayout>
+              <ProtectedPage>
                 <Resources />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/resources/:id"
             element={
-              <PageLayout showTabs={false}>
+              <ProtectedPage showTabs={false}>
                 <ResourceDetail />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/sponsor"
             element={
-              <PageLayout showTabs={false}>
+              <ProtectedPage showTabs={false}>
                 <Sponsor />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/first-meal"
             element={
-              <PageLayout showTabs={false}>
+              <ProtectedPage showTabs={false}>
                 <FirstMeal />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/comms"
             element={
-              <PageLayout showTabs={false}>
+              <ProtectedPage showTabs={false}>
                 <Comms />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/travel"
             element={
-              <PageLayout showTabs={false}>
+              <ProtectedPage showTabs={false}>
                 <Travel />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/jobs"
             element={
-              <PageLayout showTabs={false}>
+              <ProtectedPage showTabs={false}>
                 <Jobs />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
           <Route
             path="/employers"
             element={
-              <PageLayout showTabs={false}>
+              <ProtectedPage showTabs={false}>
                 <Employers />
-              </PageLayout>
+              </ProtectedPage>
             }
           />
         </Routes>

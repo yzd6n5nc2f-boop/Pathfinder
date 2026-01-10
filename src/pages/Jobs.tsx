@@ -7,7 +7,7 @@ const Jobs = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-ink">Job Opportunities</h2>
+        <h2 className="text-xl font-semibold text-ink">Job opportunities</h2>
         <Link to="/employers" className="text-sm font-semibold text-brand-700">
           Employers directory
         </Link>
@@ -16,7 +16,7 @@ const Jobs = () => {
         {jobOpportunities.map((job) => (
           <div key={job} className="rounded-2xl bg-white p-4 shadow-card">
             <p className="text-sm font-semibold text-ink">{job}</p>
-            <p className="text-xs text-slate-500">Apply with support from your advisor.</p>
+            <p className="text-xs text-slate-500">Apply with support from your adviser.</p>
             <Button className="mt-3" variant="secondary">
               Save job
             </Button>
