@@ -4,6 +4,7 @@ import Card from "../components/Card";
 import { ArrowRightIcon, PhoneIcon } from "../components/Icons";
 import {
   communityTopics,
+  courses,
   jobOpportunities,
   supportContacts
 } from "../data/mock";
@@ -91,18 +92,20 @@ const Dashboard = () => {
         <Card title="Support contacts" headerTone="blue">
           <ul className="divide-y divide-line">
             {supportContacts.map((contact) => (
-              <li
-                key={contact.name}
-                className="flex items-center justify-between gap-3 py-3"
-              >
-                <div>
-                  <p className="font-semibold text-ink">{contact.name}</p>
-                  <p className="text-xs text-muted">{contact.role}</p>
-                </div>
-                <button className="inline-flex min-h-[40px] items-center gap-2 rounded-full bg-brand-50 px-3 text-xs font-semibold text-brand">
-                  <PhoneIcon className="h-4 w-4" />
-                  {contact.action}
-                </button>
+              <li key={contact.id}>
+                <Link
+                  to={`/contacts/${contact.id}`}
+                  className="flex items-center justify-between gap-3 py-3"
+                >
+                  <div>
+                    <p className="font-semibold text-ink">{contact.name}</p>
+                    <p className="text-xs text-muted">{contact.role}</p>
+                  </div>
+                  <span className="inline-flex min-h-[40px] items-center gap-2 rounded-full bg-brand-50 px-3 text-xs font-semibold text-brand">
+                    <PhoneIcon className="h-4 w-4" />
+                    Contact
+                  </span>
+                </Link>
               </li>
             ))}
           </ul>
@@ -118,10 +121,15 @@ const Dashboard = () => {
           }
         >
           <ul className="divide-y divide-line">
-            {jobOpportunities.map((job) => (
-              <li key={job} className="flex items-center justify-between py-2">
-                <span className="font-semibold text-ink">{job}</span>
-                <ArrowRightIcon className="h-4 w-4 text-muted" />
+            {jobOpportunities.slice(0, 3).map((job) => (
+              <li key={job.id}>
+                <Link
+                  to={`/jobs/${job.id}`}
+                  className="flex items-center justify-between py-2"
+                >
+                  <span className="font-semibold text-ink">{job.title}</span>
+                  <ArrowRightIcon className="h-4 w-4 text-muted" />
+                </Link>
               </li>
             ))}
           </ul>
@@ -138,23 +146,23 @@ const Dashboard = () => {
           title="Learning & courses"
           headerTone="neutral"
           actions={
-            <Link
-              to="/employers"
-              className="text-xs font-semibold text-white/90"
-            >
+            <Link to="/courses" className="text-xs font-semibold text-white/90">
               Explore
             </Link>
           }
         >
           <ul className="divide-y divide-line">
-            <li className="flex items-center justify-between py-2">
-              <span className="font-semibold text-ink">Skills Training</span>
-              <ArrowRightIcon className="h-4 w-4 text-muted" />
-            </li>
-            <li className="flex items-center justify-between py-2">
-              <span className="font-semibold text-ink">Education Programmes</span>
-              <ArrowRightIcon className="h-4 w-4 text-muted" />
-            </li>
+            {courses.slice(0, 2).map((course) => (
+              <li key={course.id}>
+                <Link
+                  to={`/courses/${course.id}`}
+                  className="flex items-center justify-between py-2"
+                >
+                  <span className="font-semibold text-ink">{course.title}</span>
+                  <ArrowRightIcon className="h-4 w-4 text-muted" />
+                </Link>
+              </li>
+            ))}
           </ul>
           <p className="text-xs text-muted">
             Local colleges and employer-led training options.
@@ -165,24 +173,26 @@ const Dashboard = () => {
           title="Community forum"
           headerTone="blue"
           actions={
-            <Link
-              to="/community"
-              className="text-xs font-semibold text-white/90"
-            >
+            <Link to="/community" className="text-xs font-semibold text-white/90">
               View
             </Link>
           }
         >
           <ul className="divide-y divide-line">
             {communityTopics.map((topic) => (
-              <li key={topic.title} className="flex items-center justify-between py-2">
-                <div>
-                  <span className="font-semibold text-ink">{topic.title}</span>
-                  <span className="ml-2 text-xs text-muted">
-                    {topic.replies} replies
-                  </span>
-                </div>
-                <ArrowRightIcon className="h-4 w-4 text-muted" />
+              <li key={topic.id}>
+                <Link
+                  to={`/community/${topic.id}`}
+                  className="flex items-center justify-between py-2"
+                >
+                  <div>
+                    <span className="font-semibold text-ink">{topic.title}</span>
+                    <span className="ml-2 text-xs text-muted">
+                      {topic.repliesCount} replies
+                    </span>
+                  </div>
+                  <ArrowRightIcon className="h-4 w-4 text-muted" />
+                </Link>
               </li>
             ))}
           </ul>
