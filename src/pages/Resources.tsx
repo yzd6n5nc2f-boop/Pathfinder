@@ -11,7 +11,7 @@ const Resources = () => {
           <Link
             key={resource.id}
             to={`/resources/${resource.id}`}
-            className="rounded-2xl bg-white p-4 shadow-card transition hover:-translate-y-0.5"
+            className="rounded-2xl bg-white p-4 shadow-card transition supports-[hover:hover]:hover:-translate-y-0.5"
           >
             <p className="text-sm font-semibold text-ink">{resource.title}</p>
             <p className="text-sm text-muted">{resource.summary}</p>

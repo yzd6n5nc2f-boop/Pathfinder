@@ -16,7 +16,7 @@ const Courses = () => {
           <Link
             key={course.id}
             to={`/courses/${course.id}`}
-            className="relative isolate rounded-2xl bg-white p-4 shadow-card transition hover:-translate-y-0.5"
+            className="relative isolate rounded-2xl bg-white p-4 shadow-card transition supports-[hover:hover]:hover:-translate-y-0.5"
           >
             <p className="relative z-10 text-sm font-semibold text-ink">{course.title}</p>
             <p className="relative z-10 text-xs text-muted">{course.summary}</p>

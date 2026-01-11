@@ -23,9 +23,13 @@ export const readStoredUser = (): PfUser | null => {
       return null;
     }
 
+    if (typeof parsed.name !== "string" || typeof parsed.createdAt !== "string") {
+      return null;
+    }
+
     return {
-      name: typeof parsed.name === "string" ? parsed.name : "",
-      createdAt: typeof parsed.createdAt === "string" ? parsed.createdAt : "",
+      name: parsed.name,
+      createdAt: parsed.createdAt,
       lastVoucherId: typeof parsed.lastVoucherId === "string" ? parsed.lastVoucherId : undefined,
       lastVoucherRedeemedAt:
         typeof parsed.lastVoucherRedeemedAt === "string"
