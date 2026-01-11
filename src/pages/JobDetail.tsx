@@ -23,6 +23,9 @@ const JobDetail = () => {
 
   return (
     <div className="space-y-6">
+      <Link to="/jobs" className="text-sm font-semibold text-muted hover:text-ink">
+        ← Back to jobs
+      </Link>
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">
           Job opportunity

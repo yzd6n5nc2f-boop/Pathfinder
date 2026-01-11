@@ -18,9 +18,9 @@ const Community = () => {
           <Link
             key={topic.id}
             to={`/community/${topic.id}`}
-            className="rounded-2xl bg-white p-4 shadow-card"
+            className="relative isolate rounded-2xl bg-white p-4 shadow-card"
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="relative z-10 flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-ink">{topic.title}</p>
                 <p className="text-xs text-muted">

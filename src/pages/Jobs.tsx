@@ -50,9 +50,9 @@ const Jobs = () => {
 
       <div className="space-y-3">
         {filteredJobs.map((job) => (
-          <div key={job.id} className="rounded-2xl bg-white p-4 shadow-card">
-            <div className="flex items-start justify-between gap-3">
-              <div>
+          <div key={job.id} className="relative isolate rounded-2xl bg-white p-4 shadow-card">
+            <div className="relative z-10 flex items-start justify-between gap-3">
+              <div className="relative z-10">
                 <p className="text-sm font-semibold text-ink">{job.title}</p>
                 <p className="text-xs text-muted">
                   {job.area} · {job.type}
@@ -65,8 +65,8 @@ const Jobs = () => {
                 View details
               </Link>
             </div>
-            <p className="mt-2 text-xs text-muted">{job.summary}</p>
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+            <p className="relative z-10 mt-2 text-xs text-muted">{job.summary}</p>
+            <div className="relative z-10 mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button className="sm:w-auto" variant="secondary">
                 Save job
               </Button>
