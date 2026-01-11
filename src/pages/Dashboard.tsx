@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Card from "../components/Card";
 import { ArrowRightIcon, PhoneIcon } from "../components/Icons";
@@ -10,6 +10,16 @@ import {
 } from "../data/mock";
 
 const Dashboard = () => {
+  const [showAllQuickLinks, setShowAllQuickLinks] = useState(false);
+  const quickLinks = [
+    { label: "First meal voucher", to: "/first-meal" },
+    { label: "Phone credit", to: "/comms" },
+    { label: "Sponsor contact", to: "/sponsor" },
+    { label: "Travel support", to: "/travel" },
+    { label: "Employers directory", to: "/employers" },
+    { label: "Support directory", to: "/resources" }
+  ];
+
   return (
     <div className="flex flex-col gap-4">
       <section
@@ -43,48 +53,29 @@ const Dashboard = () => {
           </Link>
         </div>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
-          <Link
-            to="/first-meal"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
+          {quickLinks.map((link, index) => {
+            const isHiddenOnMobile = index >= 3 && !showAllQuickLinks;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand ${
+                  isHiddenOnMobile ? "hidden sm:inline-flex" : "inline-flex"
+                }`}
+              >
+                {link.label}
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => setShowAllQuickLinks((showAll) => !showAll)}
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand sm:hidden"
           >
-            First meal voucher
+            {showAllQuickLinks ? "Show less" : "See more"}
             <ArrowRightIcon className="h-4 w-4" />
-          </Link>
-          <Link
-            to="/comms"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
-          >
-            Phone credit
-            <ArrowRightIcon className="h-4 w-4" />
-          </Link>
-          <Link
-            to="/sponsor"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
-          >
-            Sponsor contact
-            <ArrowRightIcon className="h-4 w-4" />
-          </Link>
-          <Link
-            to="/travel"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
-          >
-            Travel support
-            <ArrowRightIcon className="h-4 w-4" />
-          </Link>
-          <Link
-            to="/employers"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
-          >
-            Employers directory
-            <ArrowRightIcon className="h-4 w-4" />
-          </Link>
-          <Link
-            to="/resources"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand"
-          >
-            Support directory
-            <ArrowRightIcon className="h-4 w-4" />
-          </Link>
+          </button>
         </div>
       </section>
 
