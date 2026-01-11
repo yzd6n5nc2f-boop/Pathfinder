@@ -26,7 +26,6 @@ import { readStoredUser } from "./utils/auth";
 
 type ProtectedPageProps = {
   children: React.ReactNode;
-  showTabs?: boolean;
 };
 
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
@@ -40,10 +39,10 @@ const RequireAuth = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const ProtectedPage = ({ children, showTabs }: ProtectedPageProps) => {
+const ProtectedPage = ({ children }: ProtectedPageProps) => {
   return (
     <RequireAuth>
-      <PageLayout showTabs={showTabs}>{children}</PageLayout>
+      <PageLayout>{children}</PageLayout>
     </RequireAuth>
   );
 };
@@ -81,7 +80,7 @@ const App = () => {
           <Route
             path="/community/:id"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <TopicDetail />
               </ProtectedPage>
             }
@@ -97,7 +96,7 @@ const App = () => {
           <Route
             path="/resources/:id"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <ResourceDetail />
               </ProtectedPage>
             }
@@ -105,7 +104,7 @@ const App = () => {
           <Route
             path="/sponsor"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <Sponsor />
               </ProtectedPage>
             }
@@ -113,7 +112,7 @@ const App = () => {
           <Route
             path="/first-meal"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <FirstMeal />
               </ProtectedPage>
             }
@@ -121,7 +120,7 @@ const App = () => {
           <Route
             path="/comms"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <Comms />
               </ProtectedPage>
             }
@@ -129,7 +128,7 @@ const App = () => {
           <Route
             path="/travel"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <Travel />
               </ProtectedPage>
             }
@@ -137,7 +136,7 @@ const App = () => {
           <Route
             path="/travel/:id"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <TravelDetail />
               </ProtectedPage>
             }
@@ -145,7 +144,7 @@ const App = () => {
           <Route
             path="/contacts"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <Contacts />
               </ProtectedPage>
             }
@@ -153,7 +152,7 @@ const App = () => {
           <Route
             path="/contacts/:id"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <ContactDetail />
               </ProtectedPage>
             }
@@ -161,7 +160,7 @@ const App = () => {
           <Route
             path="/jobs"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <Jobs />
               </ProtectedPage>
             }
@@ -169,7 +168,7 @@ const App = () => {
           <Route
             path="/jobs/:id"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <JobDetail />
               </ProtectedPage>
             }
@@ -177,7 +176,7 @@ const App = () => {
           <Route
             path="/courses"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <Courses />
               </ProtectedPage>
             }
@@ -185,7 +184,7 @@ const App = () => {
           <Route
             path="/courses/:id"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <CourseDetail />
               </ProtectedPage>
             }
@@ -193,7 +192,7 @@ const App = () => {
           <Route
             path="/employers"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <Employers />
               </ProtectedPage>
             }
@@ -201,7 +200,7 @@ const App = () => {
           <Route
             path="/employers/:id"
             element={
-              <ProtectedPage showTabs={false}>
+              <ProtectedPage>
                 <EmployerDetail />
               </ProtectedPage>
             }

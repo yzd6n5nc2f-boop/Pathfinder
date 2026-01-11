@@ -16,11 +16,11 @@ const Courses = () => {
           <Link
             key={course.id}
             to={`/courses/${course.id}`}
-            className="rounded-2xl bg-white p-4 shadow-card transition hover:-translate-y-0.5"
+            className="relative isolate rounded-2xl bg-white p-4 shadow-card transition hover:-translate-y-0.5"
           >
-            <p className="text-sm font-semibold text-ink">{course.title}</p>
-            <p className="text-xs text-muted">{course.summary}</p>
-            <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-muted">
+            <p className="relative z-10 text-sm font-semibold text-ink">{course.title}</p>
+            <p className="relative z-10 text-xs text-muted">{course.summary}</p>
+            <div className="relative z-10 mt-2 flex flex-wrap gap-2 text-[11px] text-muted">
               {course.duration ? <span>{course.duration}</span> : null}
               {course.format ? <span>• {course.format}</span> : null}
             </div>

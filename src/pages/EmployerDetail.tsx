@@ -28,6 +28,9 @@ const EmployerDetail = () => {
 
   return (
     <div className="space-y-6">
+      <Link to="/employers" className="text-sm font-semibold text-muted hover:text-ink">
+        ← Back to employers
+      </Link>
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">
           Examples only

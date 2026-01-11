@@ -20,6 +20,9 @@ const ResourceDetail = () => {
 
   return (
     <div className="space-y-4">
+      <Link to="/resources" className="text-sm font-semibold text-muted hover:text-ink">
+        ← Back to resources
+      </Link>
       <h2 className="text-xl font-semibold text-ink">{resource.title}</h2>
       <div className="rounded-2xl bg-white p-5 shadow-card">
         <p className="text-sm text-muted">{resource.details}</p>
