@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import Card from "../components/Card";
-import { ArrowRightIcon, PhoneIcon } from "../components/Icons";
+import {
+  ArrowRightIcon,
+  MapIcon,
+  PhoneIcon,
+  ResourceIcon
+} from "../components/Icons";
 import {
   communityTopics,
   courses,
@@ -10,14 +15,49 @@ import {
 } from "../data/mock";
 
 const Dashboard = () => {
-  const [showAllQuickLinks, setShowAllQuickLinks] = useState(false);
-  const quickLinks = [
-    { label: "First meal voucher", to: "/first-meal" },
-    { label: "Phone credit", to: "/comms" },
-    { label: "Sponsor contact", to: "/sponsor" },
-    { label: "Travel support", to: "/travel" },
-    { label: "Employers directory", to: "/employers" },
-    { label: "Support directory", to: "/resources" }
+  const heroTiles = [
+    {
+      label: "Get Support",
+      to: "/sponsor",
+      icon: PhoneIcon,
+      tone:
+        "bg-brand-gradient text-white shadow-card hover:shadow-card focus-visible:ring-brand/40"
+    },
+    {
+      label: "Find opportunities",
+      to: "/jobs",
+      icon: ResourceIcon,
+      tone:
+        "bg-amber-gradient text-white shadow-card hover:shadow-card focus-visible:ring-amber-300/60"
+    },
+    {
+      label: "Learning & courses",
+      to: "/courses",
+      icon: ResourceIcon,
+      tone:
+        "bg-neutral-gradient text-white shadow-card hover:shadow-card focus-visible:ring-slate-200/60"
+    },
+    {
+      label: "First meal voucher",
+      to: "/first-meal",
+      icon: ResourceIcon,
+      tone:
+        "border border-brand-100 bg-brand-50 text-brand shadow-card/40 hover:shadow-card focus-visible:ring-brand/30"
+    },
+    {
+      label: "Phone credit",
+      to: "/comms",
+      icon: PhoneIcon,
+      tone:
+        "border border-amber-100 bg-amber-50 text-amber-900 shadow-card/40 hover:shadow-card focus-visible:ring-amber-200/70"
+    },
+    {
+      label: "Travel support",
+      to: "/travel",
+      icon: MapIcon,
+      tone:
+        "border border-slate-200 bg-white text-ink shadow-card/40 hover:shadow-card focus-visible:ring-slate-200/70"
+    }
   ];
 
   return (
@@ -38,44 +78,25 @@ const Dashboard = () => {
         <p className="mt-2 text-sm font-medium text-muted">
           Connect. Support. Thrive.
         </p>
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link
-            to="/sponsor"
-            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-button bg-brand-gradient px-4 py-2 text-sm font-semibold text-white shadow-card"
-          >
-            Get Support
-          </Link>
-          <Link
-            to="/jobs"
-            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-button bg-amber-gradient px-4 py-2 text-sm font-semibold text-white shadow-card"
-          >
-            Find opportunities
-          </Link>
-        </div>
-        <div className="mt-5 flex flex-wrap justify-center gap-3">
-          {quickLinks.map((link, index) => {
-            const isHiddenOnMobile = index >= 3 && !showAllQuickLinks;
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          {heroTiles.map((tile) => {
+            const Icon = tile.icon;
             return (
               <Link
-                key={link.to}
-                to={link.to}
-                className={`min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand ${
-                  isHiddenOnMobile ? "hidden sm:inline-flex" : "inline-flex"
-                }`}
+                key={tile.to}
+                to={tile.to}
+                className={`group flex min-h-[96px] flex-col items-start justify-between gap-3 rounded-[18px] p-4 text-left text-sm font-semibold transition duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 ${tile.tone}`}
               >
-                {link.label}
-                <ArrowRightIcon className="h-4 w-4" />
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-current shadow-sm">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className="flex w-full items-center justify-between gap-2">
+                  {tile.label}
+                  <ArrowRightIcon className="h-4 w-4 opacity-70" />
+                </span>
               </Link>
             );
           })}
-          <button
-            type="button"
-            onClick={() => setShowAllQuickLinks((showAll) => !showAll)}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-white/80 px-4 py-2 text-xs font-semibold text-brand sm:hidden"
-          >
-            {showAllQuickLinks ? "Show less" : "See more"}
-            <ArrowRightIcon className="h-4 w-4" />
-          </button>
         </div>
       </section>
 
