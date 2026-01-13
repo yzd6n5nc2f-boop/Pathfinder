@@ -49,41 +49,45 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <section
-        className="relative overflow-hidden rounded-[24px] px-5 py-6 text-center shadow-card"
-        style={{
-          backgroundImage:
-            "radial-gradient(1200px 220px at 50% 0%, rgba(255,255,255,0.95), rgba(255,255,255,0.65)), linear-gradient(180deg, rgba(35,74,115,0.18), rgba(35,74,115,0))"
-        }}
-      >
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-          Your next steps
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold text-brand">
-          Rebuild your future.
-        </h1>
-        <p className="mt-2 text-sm font-medium text-muted">
-          Connect. Support. Thrive.
-        </p>
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          {heroTiles.map((tile) => {
-            const Icon = tile.icon;
-            return (
-              <Link
-                key={tile.to}
-                to={tile.to}
-                className={`group flex min-h-[132px] flex-col items-center justify-center gap-3 rounded-[18px] p-6 text-center text-sm font-semibold transition duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 ${tile.tone}`}
-              >
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-current shadow-sm">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <span>{tile.label}</span>
-              </Link>
-            );
-          })}
+    <div className="flex h-[100dvh] flex-col overflow-hidden">
+      <main className="flex flex-1 items-center justify-center overflow-hidden">
+        <div className="w-full max-w-md px-4">
+          <section
+            className="relative overflow-hidden rounded-[24px] p-5 text-center shadow-card sm:p-6"
+            style={{
+              backgroundImage:
+                "radial-gradient(1200px 220px at 50% 0%, rgba(255,255,255,0.95), rgba(255,255,255,0.65)), linear-gradient(180deg, rgba(35,74,115,0.18), rgba(35,74,115,0))"
+            }}
+          >
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+              Your next steps
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold text-brand">
+              Rebuild your future.
+            </h1>
+            <p className="mt-2 text-sm font-medium text-muted">
+              Connect. Support. Thrive.
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {heroTiles.map((tile) => {
+                const Icon = tile.icon;
+                return (
+                  <Link
+                    key={tile.to}
+                    to={tile.to}
+                    className={`group flex min-h-[96px] flex-col items-center justify-center gap-3 rounded-[18px] p-4 text-center text-sm font-semibold transition duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 sm:min-h-[110px] sm:p-5 md:min-h-[125px] ${tile.tone}`}
+                  >
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-current shadow-sm sm:h-12 sm:w-12">
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </span>
+                    <span>{tile.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
         </div>
-      </section>
+      </main>
     </div>
   );
 };
