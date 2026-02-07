@@ -2,12 +2,45 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import { PhoneIcon } from "../components/Icons";
+import { useToast } from "../components/Toast";
 import type { SponsorPlan } from "../utils/sponsorPlan";
 import { readStoredSponsorPlan, writeStoredSponsorPlan } from "../utils/sponsorPlan";
+import {
+  createSponsorContact,
+  fetchSponsorContacts,
+  fetchSponsorPlan,
+  saveSponsorPlan,
+  type SponsorContact
+} from "../utils/sponsorApi";
 
-const initialContacts = [
-  { name: "Alex Patel", phone: "07 7000 00001" },
-  { name: "Priya Singh", phone: "07 7000 00002" }
+const contactsStorageKey = "pf_sponsor_contacts";
+
+const readStoredContacts = (): SponsorContact[] => {
+  if (typeof window === "undefined") {
+    return [];
+  }
+  const raw = window.localStorage.getItem(contactsStorageKey);
+  if (!raw) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(raw) as SponsorContact[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeStoredContacts = (contacts: SponsorContact[]) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+  window.localStorage.setItem(contactsStorageKey, JSON.stringify(contacts));
+};
+
+const initialContacts: SponsorContact[] = [
+  { id: "example-alex-patel", name: "Alex Patel", phone: "07 7000 00001" },
+  { id: "example-priya-singh", name: "Priya Singh", phone: "07 7000 00002" }
 ];
 
 const defaultPlan: SponsorPlan = {
@@ -36,21 +69,104 @@ const frequencyLabels: Record<string, string> = {
 
 const Sponsor = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [contacts, setContacts] = useState(initialContacts);
-  const [plan, setPlan] = useState<SponsorPlan>(() => readStoredSponsorPlan() ?? defaultPlan);
+  const [contacts, setContacts] = useState<SponsorContact[]>(initialContacts);
+  const [plan, setPlan] = useState<SponsorPlan>(defaultPlan);
   const [isEditingPlan, setIsEditingPlan] = useState(false);
   const [quickCheckState, setQuickCheckState] = useState<Record<string, boolean>>({});
 
-  const handleAdd = (event: React.FormEvent) => {
+  useEffect(() => {
+    let isMounted = true;
+
+    const load = async () => {
+      const [contactsResult, planResult] = await Promise.allSettled([
+        fetchSponsorContacts(),
+        fetchSponsorPlan()
+      ]);
+
+      if (!isMounted) {
+        return;
+      }
+
+      const backendOk =
+        contactsResult.status === "fulfilled" || planResult.status === "fulfilled";
+
+      if (contactsResult.status === "fulfilled") {
+        const fetched = contactsResult.value;
+        if (fetched.length > 0) {
+          setContacts(fetched);
+          writeStoredContacts(fetched);
+        } else {
+          const stored = readStoredContacts();
+          setContacts(stored.length > 0 ? stored : initialContacts);
+        }
+      } else {
+        const stored = readStoredContacts();
+        setContacts(stored.length > 0 ? stored : initialContacts);
+      }
+
+      if (planResult.status === "fulfilled" && planResult.value) {
+        const { updatedAt: _updatedAt, ...planData } = planResult.value;
+        setPlan(planData);
+        writeStoredSponsorPlan(planData);
+      } else {
+        const storedPlan = readStoredSponsorPlan();
+        setPlan(storedPlan ?? defaultPlan);
+      }
+
+      if (!backendOk) {
+        showToast("Backend not reachable. Saving locally for now.");
+      }
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [showToast]);
+
+  const handleAdd = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!name || !phone) {
       return;
     }
-    setContacts((prev) => [...prev, { name, phone }]);
-    setName("");
-    setPhone("");
+    const trimmedName = name.trim();
+    const trimmedPhone = phone.trim();
+    if (!trimmedName || !trimmedPhone) {
+      return;
+    }
+
+    try {
+      const created = await createSponsorContact({
+        name: trimmedName,
+        phone: trimmedPhone
+      });
+      setContacts((prev) => {
+        const next = [...prev, created];
+        writeStoredContacts(next);
+        return next;
+      });
+      showToast("Sponsor saved.");
+    } catch (error) {
+      const localContact: SponsorContact = {
+        id: `local-${Date.now()}`,
+        name: trimmedName,
+        phone: trimmedPhone,
+        createdAt: new Date().toISOString()
+      };
+      setContacts((prev) => {
+        const next = [...prev, localContact];
+        writeStoredContacts(next);
+        return next;
+      });
+      showToast("Backend offline. Saved locally.");
+    } finally {
+      setName("");
+      setPhone("");
+    }
   };
 
   useEffect(() => {
@@ -61,9 +177,18 @@ const Sponsor = () => {
 
   const checkedCount = Object.values(quickCheckState).filter(Boolean).length;
 
-  const handlePlanSave = () => {
-    writeStoredSponsorPlan(plan);
+  const handlePlanSave = async () => {
     setIsEditingPlan(false);
+    try {
+      const saved = await saveSponsorPlan(plan);
+      const { updatedAt: _updatedAt, ...planData } = saved;
+      setPlan(planData);
+      writeStoredSponsorPlan(planData);
+      showToast("Plan saved.");
+    } catch (error) {
+      writeStoredSponsorPlan(plan);
+      showToast("Backend offline. Plan saved locally.");
+    }
   };
 
   return (
@@ -75,7 +200,7 @@ const Sponsor = () => {
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {contacts.map((contact) => (
-            <div key={contact.name} className="rounded-2xl bg-white p-4">
+            <div key={contact.id} className="rounded-2xl bg-white p-4">
               <p className="text-sm font-semibold text-ink">{contact.name}</p>
               <p className="text-xs text-muted">{contact.phone}</p>
               <div className="mt-3 flex flex-col gap-2">
@@ -173,7 +298,7 @@ const Sponsor = () => {
                       className="rounded-xl border border-line px-3 py-2 text-sm"
                     >
                       {contacts.map((contact) => (
-                        <option key={contact.name} value={contact.name}>
+                        <option key={contact.id} value={contact.name}>
                           {contact.name}
                         </option>
                       ))}

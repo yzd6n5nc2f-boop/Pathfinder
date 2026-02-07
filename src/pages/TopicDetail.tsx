@@ -1,32 +1,119 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Button from "../components/Button";
-import { communityTopics, TopicPost } from "../data/mock";
+import { useToast } from "../components/Toast";
+import { communityTopics } from "../data/mock";
+import { fetchTopic, postReply, type TopicDetail as ApiTopicDetail, type TopicPost } from "../utils/communityApi";
 
 const STORAGE_KEY = "pf_topics";
 
 type StoredTopics = Record<string, TopicPost[]>;
 
+const readStoredTopics = (): StoredTopics => {
+  if (typeof window === "undefined") {
+    return {};
+  }
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as StoredTopics) : {};
+  } catch {
+    return {};
+  }
+};
+
+const writeStoredTopics = (topics: StoredTopics) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(topics));
+};
+
 const TopicDetail = () => {
   const { id } = useParams();
-  const topic = communityTopics.find((item) => item.id === id);
+  const { showToast } = useToast();
   const [reply, setReply] = useState("");
+  const [topic, setTopic] = useState<ApiTopicDetail | null>(null);
+  const [posts, setPosts] = useState<TopicPost[]>([]);
 
-  const storedPosts = useMemo(() => {
-    if (typeof window === "undefined") {
-      return {} as StoredTopics;
-    }
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as StoredTopics) : {};
-    } catch {
-      return {} as StoredTopics;
-    }
-  }, []);
-
-  const [posts, setPosts] = useState<TopicPost[]>(
-    topic ? storedPosts[topic.id] ?? topic.posts : []
+  const fallbackTopic = useMemo(
+    () => communityTopics.find((item) => item.id === id) ?? null,
+    [id]
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const load = async () => {
+      if (!id) {
+        return;
+      }
+      if (id.startsWith("local-")) {
+        const stored = readStoredTopics();
+        const storedPosts = stored[id] ?? [];
+        setTopic({
+          id,
+          title: "Community topic",
+          category: "Community",
+          repliesCount: storedPosts.length,
+          lastUpdated: "Just now",
+          posts: storedPosts
+        });
+        setPosts(storedPosts);
+        return;
+      }
+      try {
+        const fetched = await fetchTopic(id);
+        if (!isMounted) {
+          return;
+        }
+        setTopic(fetched);
+        setPosts(fetched.posts ?? []);
+        const stored = readStoredTopics();
+        writeStoredTopics({
+          ...stored,
+          [id]: fetched.posts ?? []
+        });
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+        const stored = readStoredTopics();
+        const storedPosts = stored[id] ?? [];
+        if (fallbackTopic) {
+          const nextPosts = storedPosts.length > 0 ? storedPosts : fallbackTopic.posts;
+          setTopic({
+            id: fallbackTopic.id,
+            title: fallbackTopic.title,
+            category: fallbackTopic.category,
+            repliesCount: fallbackTopic.repliesCount,
+            lastUpdated: fallbackTopic.lastUpdated,
+            posts: nextPosts
+          });
+          setPosts(nextPosts);
+        } else if (storedPosts.length > 0) {
+          setTopic({
+            id,
+            title: "Community topic",
+            category: "Community",
+            repliesCount: storedPosts.length,
+            lastUpdated: "Just now",
+            posts: storedPosts
+          });
+          setPosts(storedPosts);
+        } else {
+          setTopic(null);
+          setPosts([]);
+        }
+        showToast("Backend not reachable. Showing local replies.");
+      }
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fallbackTopic, id, showToast]);
 
   if (!topic) {
     return (
@@ -39,25 +126,40 @@ const TopicDetail = () => {
     );
   }
 
-  const handlePost = () => {
-    if (!reply.trim()) {
+  const handlePost = async () => {
+    if (!reply.trim() || !id) {
       return;
     }
-    const newPost: TopicPost = {
-      id: `${Date.now()}`,
-      author: "You",
-      time: "Just now",
-      text: reply.trim()
-    };
-    const next = [...posts, newPost];
-    setPosts(next);
-    setReply("");
 
-    const updated: StoredTopics = {
-      ...storedPosts,
-      [topic.id]: next
-    };
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    try {
+      const updated = await postReply(id, { author: "You", text: reply.trim() });
+      setTopic(updated);
+      setPosts(updated.posts ?? []);
+      showToast("Reply posted.");
+    } catch (error) {
+      const newPost: TopicPost = {
+        id: `local-${Date.now()}`,
+        author: "You",
+        time: "Just now",
+        text: reply.trim()
+      };
+      const nextPosts = [...posts, newPost];
+      setPosts(nextPosts);
+      setTopic({
+        ...topic,
+        posts: nextPosts,
+        repliesCount: (topic.repliesCount ?? 0) + 1,
+        lastUpdated: "Just now"
+      });
+      const stored = readStoredTopics();
+      writeStoredTopics({
+        ...stored,
+        [id]: nextPosts
+      });
+      showToast("Backend offline. Reply saved locally.");
+    } finally {
+      setReply("");
+    }
   };
 
   return (

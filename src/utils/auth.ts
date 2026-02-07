@@ -1,5 +1,9 @@
 export type PfUser = {
+  id?: string;
   name: string;
+  email?: string;
+  phone?: string;
+  area?: string;
   createdAt: string;
   lastVoucherId?: string;
   lastVoucherRedeemedAt?: string;
@@ -28,7 +32,11 @@ export const readStoredUser = (): PfUser | null => {
     }
 
     return {
+      id: typeof parsed.id === "string" ? parsed.id : undefined,
       name: parsed.name,
+      email: typeof parsed.email === "string" ? parsed.email : undefined,
+      phone: typeof parsed.phone === "string" ? parsed.phone : undefined,
+      area: typeof parsed.area === "string" ? parsed.area : undefined,
       createdAt: parsed.createdAt,
       lastVoucherId: typeof parsed.lastVoucherId === "string" ? parsed.lastVoucherId : undefined,
       lastVoucherRedeemedAt:

@@ -1,27 +1,40 @@
-# Backend Placeholder
+# Pathway Forward Backend
 
-This folder is reserved for future API work. The frontend does not require a backend to run.
+Node HTTP API with SQLite persistence for registration data, sponsor data, jobs, messages, and community topics.
 
-## Sponsor onboarding (scaffold)
+## Setup
 
-- Capture partner details, branding assets, and contact information.
-- Define CSR budgets, voucher funding limits, and campaign durations.
-- Verify eligibility to align with UK reintegration objectives and safeguarding.
+```bash
+npm install
+npm run dev
+```
 
-## Voucher funding (scaffold)
+The API listens on `http://localhost:5174` by default.
 
-- Allocate voucher pools per partner and region.
-- Track redemption rates, available balance, and expiry windows.
-- Support top-ups and manual approvals for high-demand release days.
+## Environment variables
 
-## Offer management (scaffold)
+- `PORT`: Override the server port (default: `5174`).
+- `DB_PATH`: Override the SQLite file location (default: `backend/data/pathfinder.sqlite`).
+- `CORS_ORIGIN`: Set an allowed origin for CORS (default: `*`).
 
-- Create sponsored offer slots with start/end dates.
-- Attach offer copy, eligibility notes, and redemption rules.
-- Approve and publish offers to the First Meal marketplace.
+## API
 
-## CSR reporting (scaffold)
-
-- Summaries of funded meals, regional impact, and participant reach.
-- Exportable reports for sponsor compliance and impact reporting.
-- Audit trail for voucher issuance and redemption activity.
+- `GET /api/health`
+- `GET /api/contacts`
+- `POST /api/contacts` → `{ name, phone?, email? }`
+- `DELETE /api/contacts/:id`
+- `GET /api/sponsor-plan`
+- `PUT /api/sponsor-plan` → `{ reachOut, checkInFrequency, backupContact, boundary }`
+- `GET /api/messages`
+- `POST /api/messages` → `{ sender, text }`
+- `GET /api/users`
+- `GET /api/users/:id`
+- `POST /api/users/register` → `{ name, email?, phone?, area? }`
+- `POST /api/users` → `{ name, email?, phone?, area? }`
+- `GET /api/jobs`
+- `GET /api/jobs/:id`
+- `POST /api/jobs` → `{ title, area, type, employerName?, summary, responsibilities[], requirements[], supportAvailable[], howToApply[] }`
+- `GET /api/topics`
+- `POST /api/topics` → `{ title, category?, text? }`
+- `GET /api/topics/:id`
+- `POST /api/topics/:id/posts` → `{ author?, text }`

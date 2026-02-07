@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import PageLayout from "./components/PageLayout";
 import { ToastProvider } from "./components/Toast";
+import Admin from "./pages/Admin";
 import Community from "./pages/Community";
 import Comms from "./pages/Comms";
 import ContactDetail from "./pages/ContactDetail";
@@ -66,6 +67,14 @@ const App = () => {
             element={
               <ProtectedPage>
                 <Messages />
+              </ProtectedPage>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedPage>
+                <Admin />
               </ProtectedPage>
             }
           />

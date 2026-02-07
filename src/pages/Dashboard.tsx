@@ -45,6 +45,13 @@ const Dashboard = () => {
       icon: MapIcon,
       tone:
         "border border-slate-200 bg-white text-ink shadow-card/40 hover:shadow-card focus-visible:ring-slate-200/70"
+    },
+    {
+      label: "Admin",
+      to: "/admin",
+      icon: ResourceIcon,
+      tone:
+        "border border-line bg-app text-ink shadow-card/40 hover:shadow-card focus-visible:ring-brand/30"
     }
   ];
 

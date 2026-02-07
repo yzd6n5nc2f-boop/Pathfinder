@@ -5,33 +5,86 @@ import Footer from "../components/Footer";
 import { useToast } from "../components/Toast";
 import TopBar from "../components/TopBar";
 import { clearStoredUser, readStoredUser, writeStoredUser } from "../utils/auth";
+import { registerUser } from "../utils/usersApi";
 
 const Login = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [area, setArea] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const existingUser = readStoredUser();
 
   if (existingUser) {
     return <Navigate to="/" replace />;
   }
 
-  const handleContinue = (event: React.FormEvent) => {
+  const handleContinue = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
     const trimmed = name.trim();
-    writeStoredUser({
-      name: trimmed || "Guest",
-      createdAt: new Date().toISOString()
-    });
-    navigate("/", { replace: true });
+    const nextName = trimmed || "Guest";
+    try {
+      const registered = await registerUser({
+        name: nextName,
+        email: email.trim() || undefined,
+        phone: phone.trim() || undefined,
+        area: area.trim() || undefined
+      });
+      writeStoredUser({
+        id: registered.id,
+        name: registered.name,
+        email: registered.email ?? undefined,
+        phone: registered.phone ?? undefined,
+        area: registered.area ?? undefined,
+        createdAt: registered.createdAt
+      });
+      navigate("/", { replace: true });
+    } catch (error) {
+      writeStoredUser({
+        name: nextName,
+        email: email.trim() || undefined,
+        phone: phone.trim() || undefined,
+        area: area.trim() || undefined,
+        createdAt: new Date().toISOString()
+      });
+      showToast("Backend unavailable. Saved locally only.");
+      navigate("/", { replace: true });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleGuest = () => {
-    writeStoredUser({
-      name: "Guest",
-      createdAt: new Date().toISOString()
-    });
-    navigate("/", { replace: true });
+  const handleGuest = async () => {
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const registered = await registerUser({
+        name: "Guest"
+      });
+      writeStoredUser({
+        id: registered.id,
+        name: registered.name,
+        createdAt: registered.createdAt
+      });
+      navigate("/", { replace: true });
+    } catch (error) {
+      writeStoredUser({
+        name: "Guest",
+        createdAt: new Date().toISOString()
+      });
+      showToast("Backend unavailable. Saved locally only.");
+      navigate("/", { replace: true });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -49,7 +102,7 @@ const Login = () => {
 
           <form className="space-y-4" onSubmit={handleContinue}>
             <label className="flex flex-col gap-2 text-sm font-semibold text-muted">
-              Your first name (optional)
+              First name
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -57,11 +110,44 @@ const Login = () => {
                 placeholder="e.g. Sam"
               />
             </label>
-            <Button className="w-full" type="submit">
-              Continue
+            <label className="flex flex-col gap-2 text-sm font-semibold text-muted">
+              Email (optional)
+              <input
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="rounded-xl border border-line px-3 py-2 text-sm"
+                placeholder="e.g. sam@example.com"
+              />
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-semibold text-muted">
+              Phone (optional)
+              <input
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+                className="rounded-xl border border-line px-3 py-2 text-sm"
+                placeholder="e.g. 07 7000 00000"
+              />
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-semibold text-muted">
+              Area (optional)
+              <input
+                value={area}
+                onChange={(event) => setArea(event.target.value)}
+                className="rounded-xl border border-line px-3 py-2 text-sm"
+                placeholder="e.g. Manchester"
+              />
+            </label>
+            <Button className="w-full" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Continue"}
             </Button>
-            <Button className="w-full" type="button" variant="secondary" onClick={handleGuest}>
-              Continue as guest
+            <Button
+              className="w-full"
+              type="button"
+              variant="secondary"
+              onClick={handleGuest}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Please wait..." : "Continue as guest"}
             </Button>
           </form>
 

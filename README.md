@@ -1,6 +1,6 @@
 # Pathway Forward
 
-A UK-focused, frontend-only prototype dashboard for prison release support.
+UK-focused release support app with a React frontend and Node + SQLite backend.
 
 ## Local development
 
@@ -9,24 +9,31 @@ npm install
 npm run dev
 ```
 
+## Backend (optional but needed for persistence)
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+The frontend will proxy `/api` to the backend at `http://localhost:5174`.
+
+If you prefer running it from the repo root:
+
+```bash
+npm run dev:api
+```
+
 ## Build
 
 ```bash
 npm run build
 ```
 
-## Azure Static Web Apps deployment
+## Core backend-backed features
 
-This project includes a GitHub Actions workflow for Azure Static Web Apps.
-
-1. Create an Azure Static Web Apps resource.
-2. Add the deployment token as a GitHub repository secret named `AZURE_STATIC_WEB_APPS_API_TOKEN`.
-3. Push to the `main` branch to trigger deployment.
-
-- `app_location`: `/`
-- `output_location`: `dist`
-- `api_location`: `/backend` (placeholder only)
-
-## Backend placeholder
-
-The `/backend` folder is a scaffold for future APIs. The frontend runs without it.
+- User registration and profile persistence (`/api/users/register`)
+- Sponsor contacts and sponsor plan persistence
+- Admin-managed jobs in SQLite (`/api/jobs`)
+- Messaging and community topics persisted in SQLite
