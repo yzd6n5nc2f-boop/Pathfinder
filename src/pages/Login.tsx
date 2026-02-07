@@ -7,6 +7,8 @@ import TopBar from "../components/TopBar";
 import { clearStoredUser, readStoredUser, writeStoredUser } from "../utils/auth";
 import { registerUser } from "../utils/usersApi";
 
+const consentVersion = "2026-02-07";
+
 const Login = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -14,6 +16,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [area, setArea] = useState("");
+  const [consentAccepted, setConsentAccepted] = useState(false);
+  const [safeguardingOptIn, setSafeguardingOptIn] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const existingUser = readStoredUser();
 
@@ -26,6 +30,10 @@ const Login = () => {
     if (isSubmitting) {
       return;
     }
+    if (!consentAccepted) {
+      showToast("Please accept data use terms before continuing.");
+      return;
+    }
     setIsSubmitting(true);
     const trimmed = name.trim();
     const nextName = trimmed || "Guest";
@@ -34,7 +42,10 @@ const Login = () => {
         name: nextName,
         email: email.trim() || undefined,
         phone: phone.trim() || undefined,
-        area: area.trim() || undefined
+        area: area.trim() || undefined,
+        consentAccepted: true,
+        consentVersion,
+        safeguardingOptIn
       });
       writeStoredUser({
         id: registered.id,
@@ -42,6 +53,8 @@ const Login = () => {
         email: registered.email ?? undefined,
         phone: registered.phone ?? undefined,
         area: registered.area ?? undefined,
+        consentVersion: registered.consentVersion ?? undefined,
+        consentGrantedAt: registered.consentGrantedAt ?? undefined,
         createdAt: registered.createdAt
       });
       navigate("/", { replace: true });
@@ -64,10 +77,17 @@ const Login = () => {
     if (isSubmitting) {
       return;
     }
+    if (!consentAccepted) {
+      showToast("Please accept data use terms before continuing.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const registered = await registerUser({
-        name: "Guest"
+        name: "Guest",
+        consentAccepted: true,
+        consentVersion,
+        safeguardingOptIn
       });
       writeStoredUser({
         id: registered.id,
@@ -134,12 +154,38 @@ const Login = () => {
                 value={area}
                 onChange={(event) => setArea(event.target.value)}
                 className="rounded-xl border border-line px-3 py-2 text-sm"
-                placeholder="e.g. Manchester"
-              />
-            </label>
-            <Button className="w-full" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Continue"}
-            </Button>
+              placeholder="e.g. Manchester"
+            />
+          </label>
+          <label className="flex items-start gap-3 rounded-xl border border-line bg-white px-3 py-3 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={consentAccepted}
+              onChange={(event) => setConsentAccepted(event.target.checked)}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span>
+              I agree that Pathway Forward can process my personal data to provide support
+              services, safety check-ins, and caseworker coordination.
+            </span>
+          </label>
+          <label className="flex items-start gap-3 rounded-xl border border-line bg-white px-3 py-3 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={safeguardingOptIn}
+              onChange={(event) => setSafeguardingOptIn(event.target.checked)}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span>
+              I agree to receive safeguarding follow-up if risk is detected in my messages.
+            </span>
+          </label>
+          <p className="text-[11px] text-muted">
+            You can request data export or deletion later in Privacy &amp; Safety.
+          </p>
+          <Button className="w-full" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Continue"}
+          </Button>
             <Button
               className="w-full"
               type="button"

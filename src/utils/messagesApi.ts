@@ -5,6 +5,8 @@ export type Message = {
   sender: string;
   snippet: string;
   text?: string;
+  safeguardingFlag?: boolean;
+  safeguardingPrompt?: string;
   createdAt?: string;
 };
 

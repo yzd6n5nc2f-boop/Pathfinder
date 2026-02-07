@@ -25,6 +25,14 @@ If you prefer running it from the repo root:
 npm run dev:api
 ```
 
+## Run On iPhone (same Wi-Fi)
+
+```bash
+npm run dev:iphone
+```
+
+Then open `http://<your-mac-ip>:5173` in Safari on your iPhone.
+
 ## Build
 
 ```bash

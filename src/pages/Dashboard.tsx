@@ -47,6 +47,13 @@ const Dashboard = () => {
         "border border-slate-200 bg-white text-ink shadow-card/40 hover:shadow-card focus-visible:ring-slate-200/70"
     },
     {
+      label: "Privacy & safety",
+      to: "/privacy-safety",
+      icon: PhoneIcon,
+      tone:
+        "border border-brand-100 bg-white text-brand shadow-card/40 hover:shadow-card focus-visible:ring-brand/30"
+    },
+    {
       label: "Admin",
       to: "/admin",
       icon: ResourceIcon,

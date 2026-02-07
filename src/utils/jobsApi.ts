@@ -28,8 +28,11 @@ export const createManagedJob = (payload: {
   requirements: string[];
   supportAvailable: string[];
   howToApply: string[];
-}) =>
+}, adminKey: string) =>
   apiFetch<ManagedJob>("/api/jobs", {
     method: "POST",
+    headers: {
+      "X-Admin-Key": adminKey
+    },
     body: JSON.stringify(payload)
   });

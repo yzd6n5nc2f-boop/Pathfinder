@@ -4,6 +4,8 @@ export type PfUser = {
   email?: string;
   phone?: string;
   area?: string;
+  consentVersion?: string;
+  consentGrantedAt?: string;
   createdAt: string;
   lastVoucherId?: string;
   lastVoucherRedeemedAt?: string;
@@ -37,6 +39,9 @@ export const readStoredUser = (): PfUser | null => {
       email: typeof parsed.email === "string" ? parsed.email : undefined,
       phone: typeof parsed.phone === "string" ? parsed.phone : undefined,
       area: typeof parsed.area === "string" ? parsed.area : undefined,
+      consentVersion: typeof parsed.consentVersion === "string" ? parsed.consentVersion : undefined,
+      consentGrantedAt:
+        typeof parsed.consentGrantedAt === "string" ? parsed.consentGrantedAt : undefined,
       createdAt: parsed.createdAt,
       lastVoucherId: typeof parsed.lastVoucherId === "string" ? parsed.lastVoucherId : undefined,
       lastVoucherRedeemedAt:

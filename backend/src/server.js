@@ -9,9 +9,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const port = Number(process.env.PORT) || 5174;
+const host = process.env.HOST || "127.0.0.1";
 const corsOrigin = process.env.CORS_ORIGIN || "*";
+const adminApiKey = process.env.ADMIN_API_KEY || "local-admin-key";
+const consentVersionDefault = process.env.CONSENT_VERSION || "2026-02-07";
 const dbPath =
   process.env.DB_PATH || path.join(__dirname, "..", "data", "pathfinder.sqlite");
+const allowedHeaders = "Content-Type, X-Admin-Key, X-User-Id, X-Delete-Confirm";
 
 fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 
@@ -41,6 +45,7 @@ db.exec(`
     sender TEXT NOT NULL,
     snippet TEXT NOT NULL,
     text TEXT NOT NULL,
+    safeguarding_flag INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL
   );
 
@@ -69,6 +74,10 @@ db.exec(`
     email TEXT,
     phone TEXT,
     area TEXT,
+    consent_version TEXT,
+    consent_granted_at TEXT,
+    safeguarding_opt_in INTEGER NOT NULL DEFAULT 1,
+    erased_at TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
@@ -88,12 +97,30 @@ db.exec(`
   );
 `);
 
+const ensureColumn = (table, definition) => {
+  try {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!message.toLowerCase().includes("duplicate column name")) {
+      throw error;
+    }
+  }
+};
+
+ensureColumn("messages", "safeguarding_flag INTEGER NOT NULL DEFAULT 0");
+ensureColumn("users", "consent_version TEXT");
+ensureColumn("users", "consent_granted_at TEXT");
+ensureColumn("users", "safeguarding_opt_in INTEGER NOT NULL DEFAULT 1");
+ensureColumn("users", "erased_at TEXT");
+
 const defaultMessages = [
   {
     id: "seed-support-adviser",
     sender: "Support adviser",
     snippet: "Checking in to see how your plans are going.",
     text: "Checking in to see how your plans are going.",
+    safeguardingFlag: 0,
     createdAt: "seed"
   },
   {
@@ -101,6 +128,7 @@ const defaultMessages = [
     sender: "Mentor Dave",
     snippet: "Shall we set up a call for tomorrow afternoon?",
     text: "Shall we set up a call for tomorrow afternoon?",
+    safeguardingFlag: 0,
     createdAt: "seed"
   },
   {
@@ -108,6 +136,7 @@ const defaultMessages = [
     sender: "Community Team",
     snippet: "New local support group starting next week.",
     text: "New local support group starting next week.",
+    safeguardingFlag: 0,
     createdAt: "seed"
   }
 ];
@@ -157,6 +186,38 @@ const defaultTopics = [
   }
 ];
 
+const safeguardingKeywords = [
+  "suicide",
+  "self harm",
+  "self-harm",
+  "kill myself",
+  "overdose",
+  "unsafe",
+  "abuse",
+  "violence",
+  "homeless tonight",
+  "nowhere to stay",
+  "relapse"
+];
+
+const safeguardingHelplines = [
+  {
+    name: "Emergency services",
+    phone: "999",
+    note: "If someone is in immediate danger."
+  },
+  {
+    name: "NHS 111",
+    phone: "111",
+    note: "Urgent medical and mental health advice."
+  },
+  {
+    name: "Samaritans",
+    phone: "116 123",
+    note: "24/7 emotional support in the UK."
+  }
+];
+
 const parseJsonArray = (raw) => {
   if (!raw) {
     return [];
@@ -178,6 +239,42 @@ const normalizeStringArray = (value) => {
     .filter(Boolean);
 };
 
+const toNullableTrimmed = (value) => {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+};
+
+const getHeaderValue = (req, name) => {
+  const value = req.headers[name];
+  return typeof value === "string" ? value : "";
+};
+
+const isAdminRequest = (req) => {
+  const key = getHeaderValue(req, "x-admin-key");
+  return key.length > 0 && key === adminApiKey;
+};
+
+const requireAdmin = (req, res) => {
+  if (!isAdminRequest(req)) {
+    sendJson(res, 403, { error: "Admin authorization required." });
+    return false;
+  }
+  return true;
+};
+
+const canAccessOwnData = (req, userId) => {
+  const headerUserId = getHeaderValue(req, "x-user-id");
+  return headerUserId === userId;
+};
+
+const detectSafeguardingRisk = (text) => {
+  const lower = text.toLowerCase();
+  return safeguardingKeywords.some((keyword) => lower.includes(keyword));
+};
+
 const mapJobRow = (row) => ({
   id: row.id,
   title: row.title,
@@ -190,6 +287,19 @@ const mapJobRow = (row) => ({
   supportAvailable: parseJsonArray(row.supportAvailableJson),
   howToApply: parseJsonArray(row.howToApplyJson),
   createdAt: row.createdAt
+});
+
+const mapUserRow = (row) => ({
+  id: row.id,
+  name: row.name,
+  email: row.email,
+  phone: row.phone,
+  area: row.area,
+  consentVersion: row.consentVersion,
+  consentGrantedAt: row.consentGrantedAt,
+  safeguardingOptIn: Boolean(row.safeguardingOptIn),
+  createdAt: row.createdAt,
+  updatedAt: row.updatedAt
 });
 
 const selectContacts = db.prepare(
@@ -215,10 +325,10 @@ const upsertPlan = db.prepare(`
 `);
 
 const selectMessages = db.prepare(
-  "SELECT id, sender, snippet, text, created_at as createdAt FROM messages ORDER BY created_at DESC"
+  "SELECT id, sender, snippet, text, safeguarding_flag as safeguardingFlag, created_at as createdAt FROM messages ORDER BY created_at DESC"
 );
 const insertMessage = db.prepare(
-  "INSERT INTO messages (id, sender, snippet, text, created_at) VALUES (@id, @sender, @snippet, @text, @createdAt)"
+  "INSERT INTO messages (id, sender, snippet, text, safeguarding_flag, created_at) VALUES (@id, @sender, @snippet, @text, @safeguardingFlag, @createdAt)"
 );
 
 const selectTopicSummaries = db.prepare(
@@ -241,19 +351,22 @@ const updateTopicMeta = db.prepare(
 );
 
 const selectUsers = db.prepare(
-  "SELECT id, name, email, phone, area, created_at as createdAt, updated_at as updatedAt FROM users ORDER BY created_at DESC"
+  "SELECT id, name, email, phone, area, consent_version as consentVersion, consent_granted_at as consentGrantedAt, safeguarding_opt_in as safeguardingOptIn, created_at as createdAt, updated_at as updatedAt FROM users WHERE erased_at IS NULL ORDER BY created_at DESC"
 );
 const selectUserById = db.prepare(
-  "SELECT id, name, email, phone, area, created_at as createdAt, updated_at as updatedAt FROM users WHERE id = ?"
+  "SELECT id, name, email, phone, area, consent_version as consentVersion, consent_granted_at as consentGrantedAt, safeguarding_opt_in as safeguardingOptIn, created_at as createdAt, updated_at as updatedAt FROM users WHERE id = ? AND erased_at IS NULL"
 );
 const selectUserByEmail = db.prepare(
-  "SELECT id, name, email, phone, area, created_at as createdAt, updated_at as updatedAt FROM users WHERE email = ?"
+  "SELECT id, name, email, phone, area, consent_version as consentVersion, consent_granted_at as consentGrantedAt, safeguarding_opt_in as safeguardingOptIn, created_at as createdAt, updated_at as updatedAt FROM users WHERE email = ? AND erased_at IS NULL"
 );
 const insertUser = db.prepare(
-  "INSERT INTO users (id, name, email, phone, area, created_at, updated_at) VALUES (@id, @name, @email, @phone, @area, @createdAt, @updatedAt)"
+  "INSERT INTO users (id, name, email, phone, area, consent_version, consent_granted_at, safeguarding_opt_in, erased_at, created_at, updated_at) VALUES (@id, @name, @email, @phone, @area, @consentVersion, @consentGrantedAt, @safeguardingOptIn, NULL, @createdAt, @updatedAt)"
 );
 const updateUser = db.prepare(
-  "UPDATE users SET name = @name, email = @email, phone = @phone, area = @area, updated_at = @updatedAt WHERE id = @id"
+  "UPDATE users SET name = @name, email = @email, phone = @phone, area = @area, consent_version = @consentVersion, consent_granted_at = @consentGrantedAt, safeguarding_opt_in = @safeguardingOptIn, updated_at = @updatedAt WHERE id = @id"
+);
+const markUserErased = db.prepare(
+  "UPDATE users SET erased_at = @erasedAt, updated_at = @updatedAt WHERE id = @id AND erased_at IS NULL"
 );
 
 const selectJobs = db.prepare(
@@ -313,7 +426,7 @@ const sendJson = (res, status, payload) => {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": corsOrigin,
     "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type"
+    "Access-Control-Allow-Headers": allowedHeaders
   });
   res.end(body);
 };
@@ -322,7 +435,7 @@ const sendNoContent = (res) => {
   res.writeHead(204, {
     "Access-Control-Allow-Origin": corsOrigin,
     "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type"
+    "Access-Control-Allow-Headers": allowedHeaders
   });
   res.end();
 };
@@ -343,6 +456,55 @@ const readJsonBody = async (req) => {
   }
 };
 
+const upsertUserRecord = ({
+  name,
+  email,
+  phone,
+  area,
+  consentAccepted,
+  consentVersion,
+  safeguardingOptIn,
+  allowWithoutConsent
+}) => {
+  if (!allowWithoutConsent && !consentAccepted) {
+    return { error: "Consent is required before registration." };
+  }
+
+  const now = new Date().toISOString();
+  const emailValue = toNullableTrimmed(email)?.toLowerCase() ?? null;
+  const existing = emailValue ? selectUserByEmail.get(emailValue) : null;
+
+  const nextConsentVersion = consentAccepted
+    ? consentVersion || consentVersionDefault
+    : existing?.consentVersion ?? null;
+  const nextConsentGrantedAt = consentAccepted
+    ? now
+    : existing?.consentGrantedAt ?? null;
+
+  const userRecord = {
+    id: existing?.id ?? randomUUID(),
+    name,
+    email: emailValue,
+    phone: toNullableTrimmed(phone),
+    area: toNullableTrimmed(area),
+    consentVersion: nextConsentVersion,
+    consentGrantedAt: nextConsentGrantedAt,
+    safeguardingOptIn: safeguardingOptIn ? 1 : 0,
+    createdAt: existing?.createdAt ?? now,
+    updatedAt: now
+  };
+
+  if (existing) {
+    updateUser.run(userRecord);
+    const updated = selectUserById.get(existing.id);
+    return { user: mapUserRow(updated) };
+  }
+
+  insertUser.run(userRecord);
+  const created = selectUserById.get(userRecord.id);
+  return { user: mapUserRow(created) };
+};
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url ?? "", `http://${req.headers.host}`);
   const { pathname } = url;
@@ -353,6 +515,10 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "GET" && pathname === "/api/health") {
     return sendJson(res, 200, { ok: true });
+  }
+
+  if (req.method === "GET" && pathname === "/api/safeguarding/helplines") {
+    return sendJson(res, 200, safeguardingHelplines);
   }
 
   if (req.method === "GET" && pathname === "/api/contacts") {
@@ -425,7 +591,10 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === "GET" && pathname === "/api/messages") {
-    const rows = selectMessages.all();
+    const rows = selectMessages.all().map((row) => ({
+      ...row,
+      safeguardingFlag: Boolean(row.safeguardingFlag)
+    }));
     return sendJson(res, 200, rows);
   }
 
@@ -438,77 +607,159 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 400, { error: "Sender and message text are required." });
     }
 
+    const safeguardingFlag = detectSafeguardingRisk(text) ? 1 : 0;
     const snippet = text.length > 120 ? `${text.slice(0, 117)}...` : text;
     const message = {
       id: randomUUID(),
       sender,
       snippet,
       text,
+      safeguardingFlag,
       createdAt: new Date().toISOString()
     };
 
     insertMessage.run(message);
-    return sendJson(res, 201, message);
+    return sendJson(res, 201, {
+      ...message,
+      safeguardingFlag: Boolean(safeguardingFlag),
+      safeguardingPrompt: safeguardingFlag
+        ? "Potential risk language detected. Prompt urgent support options."
+        : undefined
+    });
   }
 
   if (req.method === "GET" && pathname === "/api/users") {
-    const rows = selectUsers.all();
+    if (!requireAdmin(req, res)) {
+      return;
+    }
+    const rows = selectUsers.all().map(mapUserRow);
     return sendJson(res, 200, rows);
   }
 
-  if (req.method === "GET" && pathname.startsWith("/api/users/")) {
-    const id = pathname.replace("/api/users/", "");
-    const user = selectUserById.get(id);
+  const userExportMatch = pathname.match(/^\/api\/users\/([^/]+)\/export$/);
+  if (req.method === "GET" && userExportMatch) {
+    const userId = userExportMatch[1];
+    if (!isAdminRequest(req) && !canAccessOwnData(req, userId)) {
+      return sendJson(res, 403, { error: "Not authorized to export this profile." });
+    }
+
+    const user = selectUserById.get(userId);
     if (!user) {
       return sendJson(res, 404, { error: "User not found." });
     }
-    return sendJson(res, 200, user);
+
+    return sendJson(res, 200, {
+      exportedAt: new Date().toISOString(),
+      user: mapUserRow(user)
+    });
   }
 
-  if (
-    req.method === "POST" &&
-    (pathname === "/api/users/register" || pathname === "/api/users")
-  ) {
+  const userIdMatch = pathname.match(/^\/api\/users\/([^/]+)$/);
+  if (req.method === "GET" && userIdMatch) {
+    if (!requireAdmin(req, res)) {
+      return;
+    }
+
+    const userId = userIdMatch[1];
+    const user = selectUserById.get(userId);
+    if (!user) {
+      return sendJson(res, 404, { error: "User not found." });
+    }
+    return sendJson(res, 200, mapUserRow(user));
+  }
+
+  if (req.method === "DELETE" && userIdMatch) {
+    const userId = userIdMatch[1];
+    const isOwnRequest = canAccessOwnData(req, userId);
+
+    if (!isAdminRequest(req) && !isOwnRequest) {
+      return sendJson(res, 403, { error: "Not authorized to delete this profile." });
+    }
+
+    const deleteConfirm = getHeaderValue(req, "x-delete-confirm");
+    if (deleteConfirm !== "DELETE") {
+      return sendJson(res, 400, {
+        error: "Delete confirmation missing. Send X-Delete-Confirm: DELETE."
+      });
+    }
+
+    const now = new Date().toISOString();
+    const result = markUserErased.run({
+      id: userId,
+      erasedAt: now,
+      updatedAt: now
+    });
+    if (result.changes === 0) {
+      return sendJson(res, 404, { error: "User not found." });
+    }
+
+    return sendNoContent(res);
+  }
+
+  if (req.method === "POST" && pathname === "/api/users/register") {
     const body = await readJsonBody(req);
     const name = typeof body?.name === "string" ? body.name.trim() : "";
-    const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
-    const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
-    const area = typeof body?.area === "string" ? body.area.trim() : "";
 
     if (!name) {
       return sendJson(res, 400, { error: "Name is required." });
     }
 
-    const now = new Date().toISOString();
+    const consentAccepted = Boolean(body?.consentAccepted);
+    const consentVersion =
+      typeof body?.consentVersion === "string" ? body.consentVersion.trim() : "";
+    const safeguardingOptIn = body?.safeguardingOptIn !== false;
 
-    if (email) {
-      const existing = selectUserByEmail.get(email);
-      if (existing) {
-        updateUser.run({
-          id: existing.id,
-          name,
-          email,
-          phone: phone || null,
-          area: area || null,
-          updatedAt: now
-        });
-        const updated = selectUserById.get(existing.id);
-        return sendJson(res, 200, updated);
-      }
+    const result = upsertUserRecord({
+      name,
+      email: body?.email,
+      phone: body?.phone,
+      area: body?.area,
+      consentAccepted,
+      consentVersion,
+      safeguardingOptIn,
+      allowWithoutConsent: false
+    });
+
+    if (result.error) {
+      return sendJson(res, 400, { error: result.error });
     }
 
-    const user = {
-      id: randomUUID(),
-      name,
-      email: email || null,
-      phone: phone || null,
-      area: area || null,
-      createdAt: now,
-      updatedAt: now
-    };
+    return sendJson(res, 201, result.user);
+  }
 
-    insertUser.run(user);
-    return sendJson(res, 201, user);
+  if (req.method === "POST" && pathname === "/api/users") {
+    if (!requireAdmin(req, res)) {
+      return;
+    }
+
+    const body = await readJsonBody(req);
+    const name = typeof body?.name === "string" ? body.name.trim() : "";
+
+    if (!name) {
+      return sendJson(res, 400, { error: "Name is required." });
+    }
+
+    const consentAccepted = Boolean(body?.consentAccepted);
+    const consentVersion =
+      typeof body?.consentVersion === "string" ? body.consentVersion.trim() : "";
+    const safeguardingOptIn = body?.safeguardingOptIn !== false;
+
+    const result = upsertUserRecord({
+      name,
+      email: body?.email,
+      phone: body?.phone,
+      area: body?.area,
+      consentAccepted,
+      consentVersion,
+      safeguardingOptIn,
+      allowWithoutConsent: true
+    });
+
+    if (result.error) {
+      return sendJson(res, 400, { error: result.error });
+    }
+
+    return sendJson(res, 201, result.user);
   }
 
   if (req.method === "GET" && pathname === "/api/jobs") {
@@ -516,9 +767,10 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, 200, rows);
   }
 
-  if (req.method === "GET" && pathname.startsWith("/api/jobs/")) {
-    const id = pathname.replace("/api/jobs/", "");
-    const row = selectJobById.get(id);
+  const jobIdMatch = pathname.match(/^\/api\/jobs\/([^/]+)$/);
+  if (req.method === "GET" && jobIdMatch) {
+    const jobId = jobIdMatch[1];
+    const row = selectJobById.get(jobId);
     if (!row) {
       return sendJson(res, 404, { error: "Job not found." });
     }
@@ -526,6 +778,10 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === "POST" && pathname === "/api/jobs") {
+    if (!requireAdmin(req, res)) {
+      return;
+    }
+
     const body = await readJsonBody(req);
     const title = typeof body?.title === "string" ? body.title.trim() : "";
     const area = typeof body?.area === "string" ? body.area.trim() : "";
@@ -684,6 +940,10 @@ const server = http.createServer(async (req, res) => {
   return sendJson(res, 404, { error: "Not found." });
 });
 
-server.listen(port, () => {
-  console.log(`Pathway Forward API listening on http://localhost:${port}`);
-});
+if (process.env.SKIP_SERVER_LISTEN === "1") {
+  console.log("Pathway Forward API bootstrapped (listen skipped).");
+} else {
+  server.listen(port, host, () => {
+    console.log(`Pathway Forward API listening on http://${host}:${port}`);
+  });
+}

@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Button from "../components/Button";
 import { useToast } from "../components/Toast";
 import { areaOptions } from "../data/mock";
 import { createManagedJob, fetchManagedJobs, type ManagedJob } from "../utils/jobsApi";
-import { fetchRegisteredUsers, registerUser, type RegisteredUser } from "../utils/usersApi";
+import {
+  createUserAsAdmin,
+  fetchRegisteredUsers,
+  type RegisteredUser
+} from "../utils/usersApi";
 
 const splitLines = (value: string) =>
   value
@@ -11,17 +15,41 @@ const splitLines = (value: string) =>
     .map((line) => line.trim())
     .filter(Boolean);
 
+const adminKeyStorageKey = "pf_admin_api_key";
+
+const readStoredAdminKey = () => {
+  if (typeof window === "undefined") {
+    return "";
+  }
+  return window.sessionStorage.getItem(adminKeyStorageKey) ?? "";
+};
+
+const writeStoredAdminKey = (value: string) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+  if (!value) {
+    window.sessionStorage.removeItem(adminKeyStorageKey);
+    return;
+  }
+  window.sessionStorage.setItem(adminKeyStorageKey, value);
+};
+
 const Admin = () => {
   const { showToast } = useToast();
 
+  const [adminKey, setAdminKey] = useState(() => readStoredAdminKey());
+  const [keyInput, setKeyInput] = useState(() => readStoredAdminKey());
+
   const [users, setUsers] = useState<RegisteredUser[]>([]);
   const [jobs, setJobs] = useState<ManagedJob[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [userArea, setUserArea] = useState(areaOptions[0]);
+  const [userConsentAccepted, setUserConsentAccepted] = useState(true);
 
   const [jobTitle, setJobTitle] = useState("");
   const [jobArea, setJobArea] = useState(areaOptions[0]);
@@ -33,37 +61,51 @@ const Admin = () => {
   const [jobSupport, setJobSupport] = useState("");
   const [jobHowToApply, setJobHowToApply] = useState("");
 
+  const hasAdminAccess = useMemo(() => adminKey.trim().length > 0, [adminKey]);
+
+  const loadAdminData = async (key: string) => {
+    setLoading(true);
+    try {
+      const [usersResult, jobsResult] = await Promise.all([
+        fetchRegisteredUsers(key),
+        fetchManagedJobs()
+      ]);
+      setUsers(usersResult);
+      setJobs(jobsResult);
+    } catch {
+      setUsers([]);
+      setJobs([]);
+      showToast("Admin key invalid or backend unavailable.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let isMounted = true;
+    if (!hasAdminAccess) {
+      return;
+    }
+    loadAdminData(adminKey);
+  }, [adminKey, hasAdminAccess]);
 
-    const load = async () => {
-      try {
-        const [usersResult, jobsResult] = await Promise.all([
-          fetchRegisteredUsers(),
-          fetchManagedJobs()
-        ]);
-        if (!isMounted) {
-          return;
-        }
-        setUsers(usersResult);
-        setJobs(jobsResult);
-      } catch {
-        if (isMounted) {
-          showToast("Backend unavailable. Admin data cannot be loaded.");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
+  const handleConnect = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const key = keyInput.trim();
+    if (!key) {
+      showToast("Admin key is required.");
+      return;
+    }
+    setAdminKey(key);
+    writeStoredAdminKey(key);
+  };
 
-    load();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [showToast]);
+  const handleDisconnect = () => {
+    setAdminKey("");
+    setKeyInput("");
+    writeStoredAdminKey("");
+    setUsers([]);
+    setJobs([]);
+  };
 
   const handleCreateUser = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -72,13 +114,20 @@ const Admin = () => {
       showToast("Name is required.");
       return;
     }
+    if (!hasAdminAccess) {
+      showToast("Connect with an admin key first.");
+      return;
+    }
 
     try {
-      const created = await registerUser({
+      const created = await createUserAsAdmin(adminKey, {
         name,
         email: userEmail.trim() || undefined,
         phone: userPhone.trim() || undefined,
-        area: userArea
+        area: userArea,
+        consentAccepted: userConsentAccepted,
+        consentVersion: "2026-02-07",
+        safeguardingOptIn: true
       });
       setUsers((prev) => {
         const withoutCurrent = prev.filter((item) => item.id !== created.id);
@@ -87,6 +136,7 @@ const Admin = () => {
       setUserName("");
       setUserEmail("");
       setUserPhone("");
+      setUserConsentAccepted(true);
       showToast("User saved to SQLite.");
     } catch {
       showToast("Could not save user.");
@@ -102,19 +152,26 @@ const Admin = () => {
       showToast("Job title and summary are required.");
       return;
     }
+    if (!hasAdminAccess) {
+      showToast("Connect with an admin key first.");
+      return;
+    }
 
     try {
-      const created = await createManagedJob({
-        title,
-        area: jobArea,
-        type: jobType,
-        employerName: jobEmployerName.trim() || undefined,
-        summary,
-        responsibilities: splitLines(jobResponsibilities),
-        requirements: splitLines(jobRequirements),
-        supportAvailable: splitLines(jobSupport),
-        howToApply: splitLines(jobHowToApply)
-      });
+      const created = await createManagedJob(
+        {
+          title,
+          area: jobArea,
+          type: jobType,
+          employerName: jobEmployerName.trim() || undefined,
+          summary,
+          responsibilities: splitLines(jobResponsibilities),
+          requirements: splitLines(jobRequirements),
+          supportAvailable: splitLines(jobSupport),
+          howToApply: splitLines(jobHowToApply)
+        },
+        adminKey
+      );
       setJobs((prev) => [created, ...prev]);
       setJobTitle("");
       setJobEmployerName("");
@@ -133,8 +190,38 @@ const Admin = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold text-ink">Admin</h2>
-        <p className="text-sm text-muted">Manage registered users and jobs stored in SQLite.</p>
+        <p className="text-sm text-muted">
+          Restricted area for caseworkers and service admins. Records are stored in SQLite.
+        </p>
       </div>
+
+      <section className="rounded-2xl bg-white p-5 shadow-card">
+        <h3 className="text-base font-semibold text-ink">Admin access</h3>
+        <form className="mt-4 flex flex-col gap-3 sm:flex-row" onSubmit={handleConnect}>
+          <input
+            type="password"
+            value={keyInput}
+            onChange={(event) => setKeyInput(event.target.value)}
+            className="flex-1 rounded-xl border border-line px-3 py-2 text-sm"
+            placeholder="Enter admin API key"
+          />
+          <Button type="submit">Connect</Button>
+          {hasAdminAccess ? (
+            <Button type="button" variant="secondary" onClick={handleDisconnect}>
+              Disconnect
+            </Button>
+          ) : null}
+        </form>
+        <p className="mt-2 text-xs text-muted">
+          Backend expects `ADMIN_API_KEY` (default local value: `local-admin-key`).
+        </p>
+      </section>
+
+      {!hasAdminAccess ? (
+        <section className="rounded-2xl border border-dashed border-line bg-white p-4 text-sm text-muted">
+          Connect an admin key to manage users and job postings.
+        </section>
+      ) : null}
 
       <section className="rounded-2xl bg-white p-5 shadow-card">
         <h3 className="text-base font-semibold text-ink">Register user</h3>
@@ -180,8 +267,17 @@ const Admin = () => {
               ))}
             </select>
           </label>
+          <label className="sm:col-span-2 flex items-start gap-3 rounded-xl border border-line bg-app px-3 py-3 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={userConsentAccepted}
+              onChange={(event) => setUserConsentAccepted(event.target.checked)}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span>Consent confirmed for support-related processing.</span>
+          </label>
           <div className="sm:col-span-2">
-            <Button type="submit">Save user</Button>
+            <Button type="submit" disabled={!hasAdminAccess}>Save user</Button>
           </div>
         </form>
 
@@ -192,6 +288,9 @@ const Admin = () => {
               <p className="text-muted">{user.email || "No email"}</p>
               <p className="text-muted">{user.phone || "No phone"}</p>
               <p className="text-muted">{user.area || "No area"}</p>
+              <p className="text-muted">
+                Consent: {user.consentGrantedAt ? "Confirmed" : "Pending"}
+              </p>
             </div>
           ))}
           {!loading && users.length === 0 ? (
@@ -301,7 +400,7 @@ const Admin = () => {
           </label>
 
           <div>
-            <Button type="submit">Save job</Button>
+            <Button type="submit" disabled={!hasAdminAccess}>Save job</Button>
           </div>
         </form>
 

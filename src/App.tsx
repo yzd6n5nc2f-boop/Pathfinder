@@ -17,6 +17,7 @@ import JobDetail from "./pages/JobDetail";
 import Jobs from "./pages/Jobs";
 import Login from "./pages/Login";
 import Messages from "./pages/Messages";
+import PrivacySafety from "./pages/PrivacySafety";
 import ResourceDetail from "./pages/ResourceDetail";
 import Resources from "./pages/Resources";
 import Sponsor from "./pages/Sponsor";
@@ -67,6 +68,14 @@ const App = () => {
             element={
               <ProtectedPage>
                 <Messages />
+              </ProtectedPage>
+            }
+          />
+          <Route
+            path="/privacy-safety"
+            element={
+              <ProtectedPage>
+                <PrivacySafety />
               </ProtectedPage>
             }
           />
